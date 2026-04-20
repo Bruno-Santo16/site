@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo - Joias Premium</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Estilos Admin -->
+    <link rel="stylesheet" href="css/admin-styles.css">
+</head>
+<body>
+    <!-- LOGIN ADMIN -->
+    <div class="login-container" id="loginContainer">
+        <div class="login-card">
+            <div class="login-header">
+                <i class="fas fa-gem"></i>
+                <h1>Joias Premium</h1>
+                <p>Painel Administrativo</p>
+            </div>
+            
+            <form id="adminLoginForm">
+                <div class="form-group">
+                    <label for="adminEmail">Usuário:</label>
+                    <input type="text" id="adminEmail" placeholder="admin@joias.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="adminPassword">Senha:</label>
+                    <input type="password" id="adminPassword" placeholder="Sua senha" required>
+                </div>
+                
+                <button type="submit" class="btn-primary">Acessar Painel</button>
+            </form>
+            
+            <div class="login-footer">
+                <small>Use: <strong>admin@joias.com</strong> / <strong>admin123</strong></small>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAINEL ADMIN (inicialmente oculto) -->
+    <div class="admin-panel" id="adminPanel" style="display: none;">
+        <!-- NAVBAR ADMIN -->
+        <nav class="admin-navbar">
+            <div class="navbar-container">
+                <div class="navbar-logo">
+                    <i class="fas fa-gem"></i>
+                    <span>Painel Admin</span>
+                </div>
+                
+                <div class="navbar-actions">
+                    <span id="adminUserName">Admin</span>
+                    <button class="btn-secondary" id="backToStoreBtn">
+                        <i class="fas fa-arrow-left"></i> Voltar à Loja
+                    </button>
+                    <button class="btn-danger" id="logoutAdminBtn">
+                        <i class="fas fa-sign-out-alt"></i> Sair
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- CONTEÚDO PRINCIPAL -->
+        <main class="admin-main">
+            <div class="container">
+                <!-- CABEÇALHO -->
+                <section class="admin-header">
+                    <h2>Gerenciamento de Produtos</h2>
+                    <button class="btn-primary" id="addProductBtn">
+                        <i class="fas fa-plus"></i> Adicionar Novo Produto
+                    </button>
+                </section>
+
+                <!-- FORMULÁRIO DE ADICIONAR/EDITAR PRODUTO -->
+                <section class="product-form-section" id="productFormSection" style="display: none;">
+                    <div class="form-card">
+                        <h3 id="formTitle">Adicionar Novo Produto</h3>
+                        
+                        <form id="productForm">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="productName">Nome do Produto:</label>
+                                    <input type="text" id="productName" placeholder="ex: Anel de Ouro" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="productCategory">Categoria:</label>
+                                    <select id="productCategory" required>
+                                        <option value="">Selecione uma categoria</option>
+                                        <option value="Anéis">Anéis</option>
+                                        <option value="Brincos">Brincos</option>
+                                        <option value="Colares">Colares</option>
+                                        <option value="Pulseiras">Pulseiras</option>
+                                        <option value="Pingentes">Pingentes</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="productPrice">Preço (R$):</label>
+                                    <input type="number" id="productPrice" placeholder="0.00" step="0.01" min="0" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="productImage">Foto do Produto:</label>
+                                    <div style="display: flex; gap: 0.5rem;">
+                                        <input type="text" id="productImage" placeholder="URL da imagem..." style="flex: 1;">
+                                        <input type="file" id="productImageFile" accept="image/*" style="display: none;">
+                                        <button type="button" class="btn-secondary" onclick="document.getElementById('productImageFile').click()" style="width: auto; padding: 0 1rem;">
+                                            <i class="fas fa-search"></i> Explorar
+                                        </button>
+                                    </div>
+                                    <small id="imageStatus" style="color: var(--primary-color); display: block; margin-top: 5px;"></small>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="productDescription">Descrição:</label>
+                                <textarea id="productDescription" placeholder="Descreva o produto..." rows="4"></textarea>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="submit" class="btn-primary">
+                                    <i class="fas fa-save"></i> Salvar Produto
+                                </button>
+                                <button type="button" class="btn-secondary" id="cancelFormBtn">
+                                    Cancelar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- LISTA DE PRODUTOS -->
+                <section class="products-list-section">
+                    <h3>Produtos Cadastrados</h3>
+                    
+                    <div class="products-grid" id="productsGrid">
+                        <!-- Produtos são carregados aqui pelo JavaScript -->
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal de Confirmação -->
+    <div class="modal-overlay" id="confirmOverlay"></div>
+    <div class="modal" id="confirmModal">
+        <div class="modal-content">
+            <h3>Confirmar Exclusão</h3>
+            <p id="confirmMessage">Deseja realmente excluir este produto?</p>
+            <div class="modal-actions">
+                <button class="btn-danger" id="confirmDeleteBtn">Excluir</button>
+                <button class="btn-secondary" id="cancelDeleteBtn">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/admin-script.js"></script>
+</body>
+</html>

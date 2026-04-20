@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joias Premium - Loja</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Estilos da Loja -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <!-- Logo -->
+            <div class="navbar-logo">
+                <i class="fas fa-gem"></i>
+                <span>Joias Premium</span>
+            </div>
+            
+            <!-- Menu Links -->
+            <ul class="navbar-menu">
+                <li><a href="#catalogo">Catálogo</a></li>
+            </ul>
+            
+            <!-- Ícones direita -->
+            <div class="navbar-icons">
+                <!-- Carrinho -->
+                <div class="cart-icon" id="cartIcon">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count" id="cartCount">0</span>
+                </div>
+                
+                <!-- Login -->
+                <div class="login-icon" id="loginIcon">
+                    <i class="fas fa-user"></i>
+                </div>
+                
+                <!-- Usuário logado -->
+                <div class="user-logged" id="userLogged" style="display: none;">
+                    <span id="userName">Usuário</span>
+                    <button class="logout-btn" id="logoutBtn">Sair</button>
+                </div>
+            </div>
+        </div>
+    </navbar>
+
+    <!-- SEÇÃO DE BOAS-VINDAS -->
+    <section class="welcome-section">
+        <div class="welcome-content">
+            <h1>Joias que Brilham como Você</h1>
+            <p>Coleção exclusiva de joias premium</p>
+        </div>
+    </section>
+
+    <!-- CATÁLOGO DE PRODUTOS (DINÂMICO POR CATEGORIA) -->
+    <section class="catalog-section" id="catalogo">
+        <div class="container" id="categoryContainer">
+            <!-- As seções de categoria serão geradas aqui pelo JavaScript -->
+        </div>
+    </section>
+
+    <!-- SIDEBAR DO CARRINHO -->
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h3>Seu Carrinho</h3>
+            <button class="close-cart" id="closeCartBtn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="cart-items" id="cartItems">
+            <p class="empty-cart">Carrinho vazio</p>
+        </div>
+        
+        <div class="cart-footer">
+            <div class="cart-total">
+                <strong>Total:</strong>
+                <span id="cartTotal">R$ 0,00</span>
+            </div>
+            <button class="checkout-btn" id="checkoutBtn">Finalizar Compra</button>
+        </div>
+    </div>
+
+    <!-- OVERLAY PARA MODAIS -->
+    <div class="modal-overlay" id="modalOverlay"></div>
+
+    <!-- MODAL DE LOGIN -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeLoginBtn">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <h2>Login</h2>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">E-mail:</label>
+                    <input type="email" id="email" placeholder="seu@email.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Senha:</label>
+                    <input type="password" id="password" placeholder="Mínimo 4 caracteres" required>
+                </div>
+                
+                <div class="form-group checkbox">
+                    <input type="checkbox" id="rememberPassword">
+                    <label for="rememberPassword">Lembrar minha senha</label>
+                </div>
+                
+                <div class="form-links">
+                    <a href="#" id="forgotPasswordLink">Esqueceu a senha?</a>
+                </div>
+                
+                <button type="submit" class="btn-primary">Entrar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Overlay para cart e modais -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Scripts -->
+    <script src="js/script.js"></script>
+</body>
+</html>
