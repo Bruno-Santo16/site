@@ -3,16 +3,18 @@
    ============================ */
 
 :root {
-    --primary-color: #d4af37;
-    --dark-bg: #1a1a1a;
-    --light-bg: #2a2a2a;
-    --text-light: #e0e0e0;
-    --text-dark: #1a1a1a;
-    --accent-color: #ff1493;
-    --border-color: #444;
-    --success-color: #4caf50;
-    --error-color: #f44336;
-    --warning-color: #ff9800;
+    --primary-color: #ffffff;
+    --primary-dark: #4b6cb7;
+    --primary-light: #9fb8ed;
+    --dark-bg: #0f172a;
+    --light-bg: #1e293b;
+    --text-light: #ffffff;
+    --text-dark: #0f172a;
+    --accent-color: #38bdf8;
+    --border-color: #334155;
+    --success-color: #10b981;
+    --error-color: #ef4444;
+    --warning-color: #f59e0b;
 }
 
 * {
@@ -27,8 +29,8 @@ html {
 
 body {
     font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, var(--dark-bg) 0%, #0d0d0d 100%);
-    color: var(--text-light);
+    background: url('../img/bg.png') fixed center/cover no-repeat;
+    color: #ffffff;
     line-height: 1.6;
 }
 
@@ -42,7 +44,7 @@ body {
     justify-content: center;
     min-height: 100vh;
     padding: 1rem;
-    background: linear-gradient(135deg, var(--dark-bg) 0%, #0d0d0d 100%);
+    background: url('../img/bg.png') center/cover no-repeat;
 }
 
 .login-card {
@@ -114,7 +116,7 @@ body {
 .form-group textarea:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+    box-shadow: 0 0 10px rgba(75, 108, 183, 0.2);
 }
 
 .btn-primary,
@@ -134,13 +136,13 @@ body {
 }
 
 .btn-primary {
-    background: var(--primary-color);
-    color: var(--text-dark);
+    background: #4b6cb7;
+    color: white;
     width: 100%;
 }
 
 .btn-primary:hover {
-    background: #e0c545;
+    background: #38bdf8;
     transform: scale(1.02);
 }
 
@@ -336,7 +338,7 @@ body {
 
 .product-item:hover {
     border-color: var(--primary-color);
-    box-shadow: 0 5px 20px rgba(212, 175, 55, 0.2);
+    box-shadow: 0 5px 20px rgba(75, 108, 183, 0.2);
 }
 
 .product-image-container {
@@ -349,6 +351,19 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
+}
+
+.admin-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: var(--accent-color);
+    color: white;
+    padding: 0.2rem 0.6rem;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 700;
 }
 
 .product-image-container img {
@@ -511,6 +526,45 @@ body {
 
 .modal-actions button {
     flex: 1;
+}
+
+/* ============================
+   PEDIDOS TABLE
+   ============================ */
+
+.orders-table-section {
+    margin-top: 2rem;
+}
+
+.orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.orders-table th,
+.orders-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.orders-table th {
+    background: var(--dark-bg);
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.orders-table tr:hover {
+    background: rgba(75, 108, 183, 0.05);
+}
+
+.order-status {
+    display: inline-block;
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
 }
 
 /* ============================

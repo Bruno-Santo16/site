@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Joias Premium - Loja</title>
-    
+
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+
     <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <!-- Estilos da Loja -->
     <link rel="stylesheet" href="css/styles.css">
 </head>
@@ -19,52 +19,353 @@
     <nav class="navbar">
         <div class="navbar-container">
             <!-- Logo -->
-            <div class="navbar-logo">
-                <i class="fas fa-gem"></i>
-                <span>Joias Premium</span>
+            <div class="navbar-logo" onclick="showHome()">
+                <img src="img/logo.png" alt="BS Joias" style="height: 50px; border-radius: 50%;">
+                <span>BS Joias</span>
             </div>
-            
+
             <!-- Menu Links -->
             <ul class="navbar-menu">
                 <li><a href="#catalogo">Catálogo</a></li>
+                <li><a href="#" onclick="showHome()">Início</a></li>
             </ul>
-            
+
             <!-- Ícones direita -->
             <div class="navbar-icons">
+                <!-- Wishlist -->
+                <div class="wishlist-icon login-icon" id="wishlistIcon" style="display: none;">
+                    <i class="fas fa-heart"></i>
+                    <span class="cart-count" id="wishlistCount">0</span>
+                </div>
+
                 <!-- Carrinho -->
                 <div class="cart-icon" id="cartIcon">
                     <i class="fas fa-shopping-cart"></i>
                     <span class="cart-count" id="cartCount">0</span>
                 </div>
-                
-                <!-- Login -->
-                <div class="login-icon" id="loginIcon">
+
+                <!-- Login / Profile -->
+                <div class="login-icon" id="loginIcon" onclick="window.location.href='../login/index.html'">
                     <i class="fas fa-user"></i>
                 </div>
-                
+
                 <!-- Usuário logado -->
                 <div class="user-logged" id="userLogged" style="display: none;">
                     <span id="userName">Usuário</span>
-                    <button class="logout-btn" id="logoutBtn">Sair</button>
+                    <div class="profile-icon" id="profileIcon">
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
                 </div>
             </div>
         </div>
-    </navbar>
+    </nav>
 
-    <!-- SEÇÃO DE BOAS-VINDAS -->
-    <section class="welcome-section">
-        <div class="welcome-content">
-            <h1>Joias que Brilham como Você</h1>
-            <p>Coleção exclusiva de joias premium</p>
-        </div>
-    </section>
+    <!-- DROPDOWN PERFIL -->
+    <div class="profile-dropdown" id="profileDropdown" style="display: none;">
+        <ul>
+            <li><a href="#" onclick="showProfile('orders')"><i class="fas fa-box"></i> Meus Pedidos</a></li>
+            <li><a href="#" onclick="showProfile('wishlist')"><i class="fas fa-heart"></i> Lista de Desejos</a></li>
+            <li><a href="#" onclick="showProfile('account')"><i class="fas fa-user"></i> Minha Conta</a></li>
+            <li><a href="#" onclick="handleLogout()" class="logout-link"><i class="fas fa-sign-out-alt"></i> Sair da Conta</a></li>
+        </ul>
+    </div>
 
-    <!-- CATÁLOGO DE PRODUTOS (DINÂMICO POR CATEGORIA) -->
-    <section class="catalog-section" id="catalogo">
-        <div class="container" id="categoryContainer">
-            <!-- As seções de categoria serão geradas aqui pelo JavaScript -->
+    <!-- PÁGINA INICIAL -->
+    <div id="homePage">
+        <!-- HERO SECTION -->
+        <section class="hero-section">
+            <div class="hero-content">
+                <h1>Joias que Brilham como Você</h1>
+                <p>Descubra nossa coleção exclusiva de joias premium</p>
+                <a href="#catalogo" class="hero-cta">Ver Coleção</a>
+            </div>
+        </section>
+
+        <!-- BUSCA E FILTROS -->
+        <div class="search-filter-container">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Buscar joias..." onkeyup="handleSearch(event)">
+            </div>
+            <div class="filter-box">
+                <select id="categoryFilter" onchange="handleFilter()">
+                    <option value="">Todas as Categorias</option>
+                    <option value="Anéis">Anéis</option>
+                    <option value="Brincos">Brincos</option>
+                    <option value="Colares">Colares</option>
+                    <option value="Pulseiras">Pulseiras</option>
+                    <option value="Pingentes">Pingentes</option>
+                </select>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="filter-box">
+                <select id="priceFilter" onchange="handleFilter()">
+                    <option value="">Qualquer Preço</option>
+                    <option value="0-500">Até R$ 500</option>
+                    <option value="500-1000">R$ 500 - R$ 1.000</option>
+                    <option value="1000-2000">R$ 1.000 - R$ 2.000</option>
+                    <option value="2000+">Acima de R$ 2.000</option>
+                </select>
+                <i class="fas fa-chevron-down"></i>
+            </div>
         </div>
-    </section>
+
+        <!-- CATÁLOGO DE PRODUTOS -->
+        <section class="catalog-section" id="catalogo">
+            <h2 class="section-title">Nossa Coleção</h2>
+            <div id="categoryContainer">
+                <!-- Produtos carregados via JavaScript -->
+            </div>
+        </section>
+    </div>
+
+    <!-- PÁGINA DE CHECKOUT -->
+    <div id="checkoutPage" class="checkout-page" style="display: none;">
+        <h2 class="section-title">Finalizar Compra</h2>
+        <div class="checkout-container">
+            <div class="checkout-form">
+                <!-- Dados Pessoais -->
+                <section class="checkout-section">
+                    <h3><i class="fas fa-user"></i> Dados Pessoais</h3>
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label for="firstName">Nome</label>
+                            <input type="text" id="firstName" placeholder="Seu nome" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="lastName">Sobrenome</label>
+                            <input type="text" id="lastName" placeholder="Seu sobrenome" required>
+                        </div>
+                    </div>
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label for="checkoutEmail">E-mail</label>
+                            <input type="email" id="checkoutEmail" placeholder="seu@email.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Telefone</label>
+                            <input type="tel" id="phone" placeholder="(00) 00000-0000" required>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Endereço -->
+                <section class="checkout-section">
+                    <h3><i class="fas fa-map-marker-alt"></i> Endereço de Entrega</h3>
+                    <div class="form-group">
+                        <label for="cep">CEP</label>
+                        <div style="display: flex; gap: 10px;">
+                           <input type="text" id="cep" placeholder="00000-000" onblur="fetchAddress(this.value)" required style="flex: 1;">
+                           <button type="button" class="btn-secondary" onclick="calculateShipping()" style="width: auto; padding: 0 1rem; border-radius: 8px;">Calcular Frete</button>
+                        </div>
+                    </div>                    <div class="form-row-3">
+                        <div class="form-group">
+                            <label for="street">Rua</label>
+                            <input type="text" id="street" placeholder="Rua" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="number">Número</label>
+                            <input type="text" id="number" placeholder="123" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="complement">Complemento</label>
+                            <input type="text" id="complement" placeholder="Apto, Bloco...">
+                        </div>
+                    </div>
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label for="neighborhood">Bairro</label>
+                            <input type="text" id="neighborhood" placeholder="Bairro" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="city">Cidade/Estado</label>
+                            <input type="text" id="city" placeholder="Cidade - UF" required>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Pagamento -->
+                <section class="checkout-section">
+                    <h3><i class="fas fa-credit-card"></i> Forma de Pagamento</h3>
+                    <div class="payment-methods">
+                        <div class="payment-option selected" data-payment="credit" onclick="selectPayment(this)">
+                            <i class="fas fa-credit-card"></i>
+                            <span>Cartão de Crédito</span>
+                        </div>
+                        <div class="payment-option" data-payment="pix" onclick="selectPayment(this)">
+                            <i class="fas fa-qrcode"></i>
+                            <span>PIX</span>
+                        </div>
+                        <div class="payment-option" data-payment="boleto" onclick="selectPayment(this)">
+                            <i class="fas fa-barcode"></i>
+                            <span>Boleto</span>
+                        </div>
+                    </div>
+
+                    <!-- Cartão de Crédito -->
+                    <div id="creditCardForm">
+                        <div class="form-group">
+                            <label for="cardName">Nome no Cartão</label>
+                            <input type="text" id="cardName" placeholder="Como impresso no cartão">
+                        </div>
+                        <div class="form-group">
+                            <label for="cardNumber">Número do Cartão</label>
+                            <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" maxlength="19">
+                        </div>
+                        <div class="form-row-2">
+                            <div class="form-group">
+                                <label for="cardExpiry">Validade</label>
+                                <input type="text" id="cardExpiry" placeholder="MM/AA" maxlength="5">
+                            </div>
+                            <div class="form-group">
+                                <label for="cardCvv">CVV</label>
+                                <input type="text" id="cardCvv" placeholder="123" maxlength="4">
+                            </div>
+                        </div>
+                        <div class="form-row-2">
+                            <div class="form-group">
+                                <label for="cardInstallments">Parcelas</label>
+                                <select id="cardInstallments">
+                                    <option value="1">1x sem juros</option>
+                                    <option value="2">2x sem juros</option>
+                                    <option value="3">3x sem juros</option>
+                                    <option value="4">4x sem juros</option>
+                                    <option value="5">5x sem juros</option>
+                                    <option value="6">6x sem juros</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PIX -->
+                    <div id="pixInfo" style="display: none;">
+                        <div style="text-align: center; padding: 2rem; background: var(--dark-bg); border-radius: 10px;">
+                            <i class="fas fa-qrcode" style="font-size: 4rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
+                            <p>Após finalizar o pedido, você receberá o código PIX para pagamento.</p>
+                        </div>
+                    </div>
+
+                    <!-- Boleto -->
+                    <div id="boletoInfo" style="display: none;">
+                        <div style="text-align: center; padding: 2rem; background: var(--dark-bg); border-radius: 10px;">
+                            <i class="fas fa-barcode" style="font-size: 4rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
+                            <p>Após finalizar o pedido, você poderá imprimir o boleto bancário.</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Resumo do Pedido -->
+            <div class="order-summary">
+                <h3>Resumo do Pedido</h3>
+                <div class="order-items" id="checkoutOrderItems">
+                    <!-- Itens carregados via JS -->
+                </div>
+                <div class="order-totals">
+                    <div class="row">
+                        <span>Subtotal</span>
+                        <span id="checkoutSubtotal">R$ 0,00</span>
+                    </div>
+                    <div class="row">
+                        <span>Frete</span>
+                        <span id="checkoutShipping">R$ 0,00</span>
+                    </div>
+                    <div class="row discount" id="checkoutDiscountRow" style="display: none;">
+                        <span>Desconto</span>
+                        <span id="checkoutDiscount">- R$ 0,00</span>
+                    </div>
+                    <div class="row total">
+                        <span>Total</span>
+                        <span id="checkoutTotal">R$ 0,00</span>
+                    </div>
+                </div>
+                <button class="place-order-btn" onclick="placeOrder()">
+                    <i class="fas fa-check"></i> Finalizar Pedido
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PÁGINA DE PERFIL -->
+    <div id="profilePage" class="profile-page" style="display: none;">
+        <div class="profile-container">
+            <div class="profile-sidebar">
+                <div class="profile-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="profile-name" id="profileName">Usuário</div>
+                <div class="profile-email" id="profileEmail">email@exemplo.com</div>
+                <ul class="profile-menu">
+                    <li><button class="active" onclick="showProfile('orders')"><i class="fas fa-box"></i> Meus Pedidos</button></li>
+                    <li><button onclick="showProfile('wishlist')"><i class="fas fa-heart"></i> Lista de Desejos</button></li>
+                    <li><button onclick="showProfile('account')"><i class="fas fa-user"></i> Minha Conta</button></li>
+                    <li><button class="logout-profile-btn" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Sair da Conta</button></li>
+                </ul>
+            </div>
+
+            <div class="profile-content">
+                <!-- Meus Pedidos -->
+                <section id="profileOrders" class="profile-section active">
+                    <h2><i class="fas fa-box"></i> Meus Pedidos</h2>
+                    <div id="ordersContainer">
+                        <table class="orders-table">
+                            <thead>
+                                <tr>
+                                    <th>Pedido</th>
+                                    <th>Data</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ordersTableBody">
+                                <!-- Pedidos carregados via JS -->
+                            </tbody>
+                        </table>
+                        <p id="noOrdersMessage" style="text-align: center; padding: 2rem; color: #888;">
+                            <i class="fas fa-box-open" style="font-size: 3rem; display: block; margin-bottom: 1rem;"></i>
+                            Você ainda não fez nenhum pedido.
+                        </p>
+                    </div>
+                </section>
+
+                <!-- Lista de Desejos -->
+                <section id="profileWishlist" class="profile-section">
+                    <h2><i class="fas fa-heart"></i> Lista de Desejos</h2>
+                    <div class="wishlist-grid" id="wishlistContainer">
+                        <!-- Itens da wishlist carregados via JS -->
+                    </div>
+                    <p id="noWishlistMessage" style="text-align: center; padding: 2rem; color: #888; display: none;">
+                        <i class="fas fa-heart" style="font-size: 3rem; display: block; margin-bottom: 1rem;"></i>
+                        Sua lista de desejos está vazia.
+                    </p>
+                </section>
+
+                <!-- Minha Conta -->
+                <section id="profileAccount" class="profile-section">
+                    <h2><i class="fas fa-user"></i> Minha Conta</h2>
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label>Nome</label>
+                            <input type="text" id="accountName" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>E-mail</label>
+                            <input type="email" id="accountEmail" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Data de Cadastro</label>
+                        <input type="text" id="accountRegisterDate" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Total de Pedidos</label>
+                        <input type="text" id="accountTotalOrders" readonly>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
 
     <!-- SIDEBAR DO CARRINHO -->
     <div class="cart-sidebar" id="cartSidebar">
@@ -74,61 +375,139 @@
                 <i class="fas fa-times"></i>
             </button>
         </div>
-        
+
         <div class="cart-items" id="cartItems">
-            <p class="empty-cart">Carrinho vazio</p>
+            <p class="empty-cart">
+                <i class="fas fa-shopping-cart"></i>
+                Seu carrinho está vazio
+            </p>
         </div>
-        
+
+        <!-- Cupom -->
+        <div class="coupon-section">
+            <form class="coupon-form" onsubmit="applyCoupon(event)">
+                <input type="text" class="coupon-input" id="couponCode" placeholder="Código do cupom">
+                <button type="submit" class="coupon-btn">Aplicar</button>
+            </form>
+            <div class="coupon-message" id="couponMessage"></div>
+        </div>
+
         <div class="cart-footer">
+            <div class="cart-total-row">
+                <span>Subtotal</span>
+                <span id="cartSubtotal">R$ 0,00</span>
+            </div>
+            <div class="cart-total-row discount" id="cartDiscountRow" style="display: none;">
+                <span>Desconto (<span id="couponName"></span>)</span>
+                <span id="cartDiscount">- R$ 0,00</span>
+            </div>
             <div class="cart-total">
                 <strong>Total:</strong>
                 <span id="cartTotal">R$ 0,00</span>
             </div>
-            <button class="checkout-btn" id="checkoutBtn">Finalizar Compra</button>
+            <button class="checkout-btn" id="checkoutBtn">
+                <i class="fas fa-lock"></i> Finalizar Compra
+            </button>
+            <a href="#catalogo" class="continue-shopping" onclick="closeCartSidebar()">
+                <i class="fas fa-arrow-left"></i> Continuar Comprando
+            </a>
         </div>
     </div>
 
-    <!-- OVERLAY PARA MODAIS -->
+    <!-- OVERLAY -->
+    <div class="overlay" id="overlay"></div>
     <div class="modal-overlay" id="modalOverlay"></div>
 
-    <!-- MODAL DE LOGIN -->
-    <div class="modal" id="loginModal">
-        <div class="modal-content">
-            <button class="modal-close" id="closeLoginBtn">
-                <i class="fas fa-times"></i>
-            </button>
-            
-            <h2>Login</h2>
-            
-            <form id="loginForm">
-                <div class="form-group">
-                    <label for="email">E-mail:</label>
-                    <input type="email" id="email" placeholder="seu@email.com" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="password">Senha:</label>
-                    <input type="password" id="password" placeholder="Mínimo 4 caracteres" required>
-                </div>
-                
-                <div class="form-group checkbox">
-                    <input type="checkbox" id="rememberPassword">
-                    <label for="rememberPassword">Lembrar minha senha</label>
-                </div>
-                
-                <div class="form-links">
-                    <a href="#" id="forgotPasswordLink">Esqueceu a senha?</a>
-                </div>
-                
-                <button type="submit" class="btn-primary">Entrar</button>
-            </form>
+    <!-- MODAL DE DETALHES DO PRODUTO -->
+    <div class="modal product-modal" id="productModal">
+        <button class="modal-close" id="closeProductModalBtn">
+            <i class="fas fa-times"></i>
+        </button>
+
+        <div class="product-modal-body" id="productModalContent">
+            <!-- Conteúdo carregado via JS -->
         </div>
     </div>
 
-    <!-- Overlay para cart e modais -->
-    <div class="overlay" id="overlay"></div>
+    <!-- MODAL DE ZOOM DE IMAGEM -->
+    <div class="image-zoom-modal" id="imageZoomModal" onclick="closeImageZoom()">
+        <img src="" alt="" id="zoomedImage">
+    </div>
+
+    <!-- MODAL DE DETALHES DO PEDIDO -->
+    <div class="modal order-detail-modal" id="orderDetailModal">
+        <button class="modal-close" id="closeOrderDetailBtn">
+            <i class="fas fa-times"></i>
+        </button>
+
+        <div id="orderDetailContent">
+            <!-- Conteúdo carregado via JS -->
+        </div>
+    </div>
+
+    <!-- TOAST CONTAINER -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- LOADING OVERLAY -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p>Processando...</p>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>BS Joias</h3>
+                <p>Joias exclusivas com o brilho que você merece. Qualidade e elegância desde 2026.</p>
+                <div class="footer-social">
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-whatsapp"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Links Úteis</h3>
+                <a href="#catalogo">Catálogo</a>
+                <a href="#" onclick="showProfile('orders')">Meus Pedidos</a>
+                <a href="../admin/index.html">Área Administrativa</a>
+            </div>
+            <div class="footer-section">
+                <h3>Atendimento</h3>
+                <a href="#"><i class="fas fa-phone"></i> (11) 99999-9999</a>
+                <a href="#"><i class="fas fa-envelope"></i> contato@joiaspremium.com</a>
+                <a href="#"><i class="fas fa-clock"></i> Seg-Sex: 9h às 18h</a>
+            </div>
+            <div class="footer-section">
+                <h3>Formas de Pagamento</h3>
+                <div style="font-size: 2rem; color: var(--primary-color); margin-top: 1rem;">
+                    <i class="fas fa-credit-card"></i>
+                    <i class="fas fa-qrcode"></i>
+                    <i class="fas fa-barcode"></i>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 BS Joias. Todos os direitos reservados.</p>
+        </div>
+    </footer>
 
     <!-- Scripts -->
+    <script>
+        // Script de emergência: se após 3 segundos não houver nada, oferece reset
+        setTimeout(function() {
+            const container = document.getElementById('categoryContainer');
+            if (container && container.children.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding:50px; color:white;">' +
+                    '<h3>Ops! Os produtos demoraram a carregar.</h3>' +
+                    '<p>Tente resetar os dados do seu navegador para esta página:</p>' +
+                    '<button onclick="localStorage.clear(); location.reload();" style="padding:10px 20px; background:#4b6cb7; color:white; border:none; border-radius:5px; cursor:pointer; margin-top:10px;">Resetar e Recarregar</button>' +
+                    '</div>';
+            }
+        }, 4000);
+    </script>
     <script src="js/script.js"></script>
 </body>
 </html>
