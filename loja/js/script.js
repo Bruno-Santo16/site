@@ -610,7 +610,7 @@ function selectPayment(element) {
     document.getElementById('boletoInfo').style.display = paymentType === 'boleto' ? 'block' : 'none';
 }
 
-function placeOrder() {
+async function placeOrder() {
     const carrinho = getCarrinho();
 
     if (carrinho.length === 0) {
@@ -643,8 +643,17 @@ function placeOrder() {
         return;
     }
 
+    // Mostrar Loading
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    if (loadingOverlay) loadingOverlay.style.display = 'flex';
+
     // Calcular totais
-    const subtotal = carrinho.reduce((sum, item) => sum + (item.preco * item.quantidade), 0);
+    const subtotal = carrinho.reduce((sum, item) => {
+        const temDesconto = item.desconto > 0;
+        const precoComDesconto = temDesconto ? item.preco * (1 - item.desconto / 100) : item.preco;
+        return sum + (precoComDesconto * item.quantidade);
+    }, 0);
+    
     let discount = 0;
     let shipping = subtotal > 500 ? 0 : (checkoutShippingValue !== null ? checkoutShippingValue : 29.90);
 
@@ -660,69 +669,117 @@ function placeOrder() {
 
     const total = Math.max(0, subtotal - discount + shipping);
 
-    // Criar pedido
-    const pedido = {
-        id: Date.now(),
-        data: new Date().toISOString(),
-        cliente: {
-            nome: `${document.getElementById('firstName').value} ${document.getElementById('lastName').value}`,
+    const orderData = {
+        items: carrinho.map(item => ({
+            id: item.id,
+            nome: item.nome,
+            quantidade: item.quantidade,
+            preco: item.desconto > 0 ? item.preco * (1 - item.desconto / 100) : item.preco,
+            imagem: item.imagem
+        })),
+        customer: {
+            nome: document.getElementById('firstName').value + ' ' + document.getElementById('lastName').value,
             email: document.getElementById('checkoutEmail').value,
-            telefone: document.getElementById('phone').value
+            phone: document.getElementById('phone').value
         },
-        endereco: {
+        address: {
             cep: document.getElementById('cep').value,
-            rua: document.getElementById('street').value,
-            numero: document.getElementById('number').value,
-            complemento: document.getElementById('complement').value,
-            bairro: document.getElementById('neighborhood').value,
-            cidade: document.getElementById('city').value
+            street: document.getElementById('street').value,
+            number: document.getElementById('number').value,
+            complement: document.getElementById('complement').value,
+            neighborhood: document.getElementById('neighborhood').value,
+            city: document.getElementById('city').value
         },
-        pagamento: document.querySelector('.payment-option.selected').dataset.payment,
-        itens: carrinho.map(item => {
-            const temDesconto = item.desconto > 0;
-            const precoFinal = temDesconto ? item.preco * (1 - item.desconto / 100) : item.preco;
-            return { ...item, preco: precoFinal };
-        }),
-        subtotal,
-        desconto: discount,
-        frete: shipping,
-        total,
-        status: 'pending',
-        cupom: appliedCoupon ? appliedCoupon.code : null
+        totals: {
+            subtotal,
+            discount,
+            shipping,
+            total
+        },
+        paymentMethod: document.querySelector('.payment-option.selected').dataset.payment
     };
 
-    // Diminuir estoque
-    const todosProdutos = getProdutos();
-    carrinho.forEach(item => {
-        const prodIndex = todosProdutos.findIndex(p => p.id === item.id);
-        if (prodIndex !== -1) {
-            todosProdutos[prodIndex].estoque -= item.quantidade;
+    try {
+        // Salva o pedido pendente para recuperar na volta
+        localStorage.setItem('pendingOrder', JSON.stringify(orderData));
+
+        const response = await fetch('http://127.0.0.1:3000/create_preference', {
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                items: orderData.items,
+                customer: orderData.customer,
+                address: orderData.address,
+                paymentMethod: orderData.paymentMethod,
+                external_reference: Date.now() // Gera um ID de pedido único
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.details || 'Erro desconhecido na API');
         }
-    });
-    saveProdutos(todosProdutos);
 
-    // Salvar pedido
-    const pedidos = getPedidos();
-    pedidos.push(pedido);
-    savePedidos(pedidos);
+        const preference = await response.json();
+        
+        // Redireciona para o checkout do Mercado Pago
+        window.location.href = preference.init_point;
 
-    // Marcar cupom como usado
-    if (appliedCoupon) {
-        const cuponsUsados = JSON.parse(localStorage.getItem('cuponsUsados') || '[]');
-        cuponsUsados.push(appliedCoupon.code);
-        localStorage.setItem('cuponsUsados', JSON.stringify(cuponsUsados));
+    } catch (error) {
+        console.error('Erro ao processar pedido:', error);
+        showToast('Erro ao conectar com o serviço de pagamentos. Verifique se a API está rodando.', 'error');
+        if (loadingOverlay) loadingOverlay.style.display = 'none';
     }
+}
 
-    // Limpar carrinho
-    saveCarrinho([]);
-    appliedCoupon = null;
+// Função para finalizar o pedido após retorno do Mercado Pago
+function finalizeOrderAfterPayment(status) {
+    const pendingOrder = JSON.parse(localStorage.getItem('pendingOrder'));
+    if (!pendingOrder) return;
 
-    // Atualizar UI
-    updateCartUI();
-    closeCartSidebar();
+    if (status === 'success' || status === 'pending') {
+        const pedido = {
+            id: Date.now(),
+            data: new Date().toISOString(),
+            cliente: pendingOrder.customer,
+            endereco: pendingOrder.address,
+            pagamento: pendingOrder.paymentMethod,
+            itens: pendingOrder.items,
+            subtotal: pendingOrder.totals.subtotal,
+            desconto: pendingOrder.totals.discount,
+            frete: pendingOrder.totals.shipping,
+            total: pendingOrder.totals.total,
+            status: status === 'success' ? 'completed' : 'pending',
+            cupom: appliedCoupon ? appliedCoupon.code : null
+        };
 
-    // Mostrar confirmação
-    showOrderConfirmation(pedido);
+        // Salvar pedido
+        const pedidos = getPedidos();
+        pedidos.push(pedido);
+        savePedidos(pedidos);
+
+        // Diminuir estoque
+        const todosProdutos = getProdutos();
+        pendingOrder.items.forEach(item => {
+            const prodIndex = todosProdutos.findIndex(p => p.id === item.id);
+            if (prodIndex !== -1) {
+                todosProdutos[prodIndex].estoque -= item.quantidade;
+            }
+        });
+        saveProdutos(todosProdutos);
+
+        // Limpar dados temporários
+        saveCarrinho([]);
+        localStorage.removeItem('pendingOrder');
+        
+        showOrderConfirmation(pedido);
+    } else {
+        showToast('O pagamento não foi concluído. Tente novamente.', 'warning');
+        localStorage.removeItem('pendingOrder');
+    }
 }
 
 function showOrderConfirmation(pedido) {
@@ -1339,6 +1396,14 @@ function toggleProfileDropdown() {
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log("Iniciando carregamento da loja...");
+
+    // Verificar retorno do Mercado Pago
+    const urlParams = new URLSearchParams(window.location.search);
+    const mpStatus = urlParams.get('status');
+    if (mpStatus) {
+        finalizeOrderAfterPayment(mpStatus);
+    }
+
     // Inicializar
     try {
         initializeLocalStorage();
