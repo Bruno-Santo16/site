@@ -1,102 +1,125 @@
 const express = require('express');
 const cors = require('cors');
-const { MercadoPagoConfig, Preference } = require('mercadopago');
 require('dotenv').config();
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
 
-const client = new MercadoPagoConfig({ 
-  accessToken: process.env.MP_ACCESS_TOKEN 
-});
-
-// Importação das Pastas do Postman
-const preferenceRoutes = require('./routes/preferences')(client);
-const paymentRoutes = require('./routes/payments')(client);
-const qrCodeRoutes = require('./routes/qrCodes')(client);
-const merchantOrderRoutes = require('./routes/merchantOrders')(client);
-const oauthRoutes = require('./routes/oauth')(client);
-
-app.use('/v1/preferences', preferenceRoutes);
-app.use('/v1/payments', paymentRoutes);
-app.use('/v1/qr_codes', qrCodeRoutes);
-app.use('/v1/merchant_orders', merchantOrderRoutes);
-app.use('/v1/oauth', oauthRoutes);
-
+// Rota para processar o pedido e gerar o link da InfinitePay
 app.post('/create_preference', async (req, res) => {
-    console.log('--- REQUISIÇÃO RECEBIDA DO SITE ---');
+    console.log('--- REQUISIÇÃO RECEBIDA (Gerando link InfinitePay) ---');
     try {
-        const { items, customer, paymentMethod } = req.body;
-        
-        console.log('Método Selecionado no Site:', paymentMethod);
-        console.log('Cliente:', customer.email);
+        const { items, totals, customer, address, external_reference } = req.body;
 
-        const pref = new Preference(client);
-        
-        const preferenceData = {
-            body: {
-                items: items.map(i => ({ 
-                    id: String(i.id), 
-                    title: String(i.nome), 
-                    quantity: Number(i.quantidade), 
-                    unit_price: Number(i.preco), 
-                    currency_id: 'BRL' 
-                })),
-                payer: { 
-                    email: customer.email 
-                },
-                back_urls: {
-                    success: 'http://127.0.0.1:5500/loja/index.html',
-                    failure: 'http://127.0.0.1:5500/loja/index.html',
-                    pending: 'http://127.0.0.1:5500/loja/index.html'
-                },
-                payment_methods: {
-                    excluded_payment_methods: [],
-                    excluded_payment_types: [],
-                    installments: 12
-                }
-            }
-        };
-
-        // Lógica de exclusão agressiva
-        if (paymentMethod === 'pix') {
-            console.log('BLOQUEANDO TUDO EXCETO PIX...');
-            preferenceData.body.payment_methods = {
-                excluded_payment_types: [
-                    { id: 'credit_card' },
-                    { id: 'debit_card' },
-                    { id: 'ticket' },
-                    { id: 'atm' }
-                ],
-                installments: 1
-            };
-        } else if (paymentMethod === 'boleto') {
-            console.log('BLOQUEANDO TUDO EXCETO BOLETO...');
-            preferenceData.body.payment_methods = {
-                excluded_payment_types: [
-                    { id: 'credit_card' },
-                    { id: 'debit_card' },
-                    { id: 'bank_transfer' }
-                ]
-            };
-        } else {
-            console.log('Checkout padrão (Cartão habilitado)');
+        const handle = process.env.INFINITEPAY_HANDLE;
+        if (!handle) {
+            throw new Error('INFINITEPAY_HANDLE não configurado no .env');
         }
 
-        const result = await pref.create(preferenceData);
+        // Calcula o fator de desconto para aplicar proporcionalmente em cada item
+        // Se subtotal é 100 e desconto é 10, cada item terá 10% de desconto
+        const discountFactor = totals.subtotal > 0 ? (totals.subtotal - totals.discount) / totals.subtotal : 1;
+
+        // Formata itens para o padrão da InfinitePay (preço em centavos)
+        const infinitePayItems = items.map(item => ({
+            name: item.nome, // Testando 'name' novamente pois alguns logs mostraram sucesso com ele
+            description: item.nome, // Enviando ambos para garantir compatibilidade
+            price: Math.round(item.preco * discountFactor * 100), // Aplica desconto e converte para centavos
+            quantity: parseInt(item.quantidade)
+        }));
+
+        // Adiciona o frete como um item (Frete sempre positivo)
+        if (totals.shipping > 0) {
+            infinitePayItems.push({
+                name: 'Frete',
+                description: 'Custo de entrega',
+                price: Math.round(totals.shipping * 100),
+                quantity: 1
+            });
+        }
+
+        // Formata o telefone para o padrão +55XXXXXXXXXXX
+        let phoneNumber = customer.phone.replace(/\D/g, '');
+        if (phoneNumber.length === 11) {
+            phoneNumber = `+55${phoneNumber}`;
+        }
+
+        const payload = {
+            handle: handle,
+            order_nsu: external_reference.toString(),
+            items: infinitePayItems,
+            customer: {
+                name: customer.nome,
+                email: customer.email,
+                phone_number: phoneNumber
+            },
+            address: {
+                cep: address.cep.replace(/\D/g, ''),
+                street: address.street,
+                number: address.number,
+                complement: address.complement,
+                neighborhood: address.neighborhood,
+                city: address.city
+            },
+            redirect_url: `http://127.0.0.1:5500/loja/index.html?status=success&order_id=${external_reference}`,
+            webhook_url: `https://seu-webhook.com/webhook`
+        };
+
+        console.log('Enviando payload para InfinitePay:', JSON.stringify(payload, null, 2));
+
+        const response = await fetch('https://api.infinitepay.io/invoices/public/checkout/links', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+
+        const responseText = await response.text();
+        let data;
         
-        console.log('Sucesso! Link de checkout:', result.init_point);
-        res.json({ id: result.id, init_point: result.init_point });
+        try {
+            data = JSON.parse(responseText);
+        } catch (e) {
+            console.error('Falha ao parsear JSON da InfinitePay. Resposta bruta:', responseText);
+            return res.status(500).json({ 
+                error: 'Resposta inválida da InfinitePay',
+                raw: responseText 
+            });
+        }
+
+        if (!response.ok) {
+            console.error('Erro na API da InfinitePay:', data);
+            return res.status(response.status).json({ 
+                error: 'Erro ao gerar link de pagamento',
+                details: data 
+            });
+        }
+
+        console.log('Sucesso! Link gerado:', data.url);
+
+        res.json({ 
+            init_point: data.url 
+        });
+
     } catch (error) {
-        console.error('Erro na API:', error.message);
+        console.error('Erro no servidor:', error.message);
         res.status(500).json({ error: error.message });
     }
 });
 
+// Endpoint de Webhook para receber notificações de pagamento
+app.post('/webhook', (req, res) => {
+    console.log('--- WEBHOOK RECEBIDO ---');
+    const notification = req.body;
+    console.log('Dados do Webhook:', JSON.stringify(notification, null, 2));
+    res.status(200).send('OK');
+});
+
 app.listen(port, '0.0.0.0', () => {
-  console.log('--- API MERCADO PAGO ONLINE ---');
-  console.log(`Servidor rodando em: http://127.0.0.1:${port}`);
+  console.log('--- SERVIDOR INFINITEPAY ONLINE ---');
+  console.log(`Rodando em: http://127.0.0.1:${port}`);
 });

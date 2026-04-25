@@ -599,17 +599,6 @@ function updateCheckoutUI() {
     document.getElementById('checkoutTotal').textContent = `R$ ${total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
 }
 
-function selectPayment(element) {
-    document.querySelectorAll('.payment-option').forEach(opt => opt.classList.remove('selected'));
-    element.classList.add('selected');
-
-    const paymentType = element.dataset.payment;
-
-    document.getElementById('creditCardForm').style.display = paymentType === 'credit' ? 'block' : 'none';
-    document.getElementById('pixInfo').style.display = paymentType === 'pix' ? 'block' : 'none';
-    document.getElementById('boletoInfo').style.display = paymentType === 'boleto' ? 'block' : 'none';
-}
-
 async function placeOrder() {
     const carrinho = getCarrinho();
 
@@ -669,7 +658,9 @@ async function placeOrder() {
 
     const total = Math.max(0, subtotal - discount + shipping);
 
+    const external_reference = Date.now();
     const orderData = {
+        external_reference: external_reference,
         items: carrinho.map(item => ({
             id: item.id,
             nome: item.nome,
@@ -696,7 +687,7 @@ async function placeOrder() {
             shipping,
             total
         },
-        paymentMethod: document.querySelector('.payment-option.selected').dataset.payment
+        paymentMethod: 'infinitepay'
     };
 
     try {
@@ -713,8 +704,9 @@ async function placeOrder() {
                 items: orderData.items,
                 customer: orderData.customer,
                 address: orderData.address,
+                totals: orderData.totals,
                 paymentMethod: orderData.paymentMethod,
-                external_reference: Date.now() // Gera um ID de pedido único
+                external_reference: external_reference
             })
         });
 
@@ -725,7 +717,7 @@ async function placeOrder() {
 
         const preference = await response.json();
         
-        // Redireciona para o checkout do Mercado Pago
+        // Redireciona para o checkout da InfinitePay
         window.location.href = preference.init_point;
 
     } catch (error) {
@@ -735,14 +727,14 @@ async function placeOrder() {
     }
 }
 
-// Função para finalizar o pedido após retorno do Mercado Pago
+// Função para finalizar o pedido após retorno da InfinitePay
 function finalizeOrderAfterPayment(status) {
     const pendingOrder = JSON.parse(localStorage.getItem('pendingOrder'));
     if (!pendingOrder) return;
 
     if (status === 'success' || status === 'pending') {
         const pedido = {
-            id: Date.now(),
+            id: pendingOrder.external_reference || Date.now(),
             data: new Date().toISOString(),
             cliente: pendingOrder.customer,
             endereco: pendingOrder.address,
@@ -1397,11 +1389,18 @@ function toggleProfileDropdown() {
 document.addEventListener('DOMContentLoaded', () => {
     console.log("Iniciando carregamento da loja...");
 
-    // Verificar retorno do Mercado Pago
+    // Verificar retorno do Checkout (AbacatePay ou InfinitePay)
     const urlParams = new URLSearchParams(window.location.search);
-    const mpStatus = urlParams.get('status');
-    if (mpStatus) {
-        finalizeOrderAfterPayment(mpStatus);
+    const paymentStatus = urlParams.get('status');
+    const transactionNsu = urlParams.get('transaction_nsu');
+    const orderNsu = urlParams.get('order_nsu');
+
+    if (paymentStatus || (transactionNsu && orderNsu)) {
+        // Se houver transactionNsu, consideramos como sucesso do InfinitePay
+        const status = paymentStatus || (transactionNsu ? 'success' : null);
+        if (status) {
+            finalizeOrderAfterPayment(status);
+        }
     }
 
     // Inicializar

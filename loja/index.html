@@ -20,7 +20,7 @@
         <div class="navbar-container">
             <!-- Logo -->
             <div class="navbar-logo" onclick="showHome()">
-                <img src="img/logo.png" alt="BS Joias" style="height: 50px; border-radius: 50%;">
+                <img src="img/logo.png" alt="BS Joias" style="height: 80px; border-radius: 50%;">
                 <span>BS Joias</span>
             </div>
 
@@ -180,76 +180,6 @@
                         <div class="form-group">
                             <label for="city">Cidade/Estado</label>
                             <input type="text" id="city" placeholder="Cidade - UF" required>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Pagamento -->
-                <section class="checkout-section">
-                    <h3><i class="fas fa-credit-card"></i> Forma de Pagamento</h3>
-                    <div class="payment-methods">
-                        <div class="payment-option selected" data-payment="credit" onclick="selectPayment(this)">
-                            <i class="fas fa-credit-card"></i>
-                            <span>Cartão de Crédito</span>
-                        </div>
-                        <div class="payment-option" data-payment="pix" onclick="selectPayment(this)">
-                            <i class="fas fa-qrcode"></i>
-                            <span>PIX</span>
-                        </div>
-                        <div class="payment-option" data-payment="boleto" onclick="selectPayment(this)">
-                            <i class="fas fa-barcode"></i>
-                            <span>Boleto</span>
-                        </div>
-                    </div>
-
-                    <!-- Cartão de Crédito -->
-                    <div id="creditCardForm">
-                        <div class="form-group">
-                            <label for="cardName">Nome no Cartão</label>
-                            <input type="text" id="cardName" placeholder="Como impresso no cartão">
-                        </div>
-                        <div class="form-group">
-                            <label for="cardNumber">Número do Cartão</label>
-                            <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" maxlength="19">
-                        </div>
-                        <div class="form-row-2">
-                            <div class="form-group">
-                                <label for="cardExpiry">Validade</label>
-                                <input type="text" id="cardExpiry" placeholder="MM/AA" maxlength="5">
-                            </div>
-                            <div class="form-group">
-                                <label for="cardCvv">CVV</label>
-                                <input type="text" id="cardCvv" placeholder="123" maxlength="4">
-                            </div>
-                        </div>
-                        <div class="form-row-2">
-                            <div class="form-group">
-                                <label for="cardInstallments">Parcelas</label>
-                                <select id="cardInstallments">
-                                    <option value="1">1x sem juros</option>
-                                    <option value="2">2x sem juros</option>
-                                    <option value="3">3x sem juros</option>
-                                    <option value="4">4x sem juros</option>
-                                    <option value="5">5x sem juros</option>
-                                    <option value="6">6x sem juros</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- PIX -->
-                    <div id="pixInfo" style="display: none;">
-                        <div style="text-align: center; padding: 2rem; background: var(--dark-bg); border-radius: 10px;">
-                            <i class="fas fa-qrcode" style="font-size: 4rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
-                            <p>Após finalizar o pedido, você receberá o código PIX para pagamento.</p>
-                        </div>
-                    </div>
-
-                    <!-- Boleto -->
-                    <div id="boletoInfo" style="display: none;">
-                        <div style="text-align: center; padding: 2rem; background: var(--dark-bg); border-radius: 10px;">
-                            <i class="fas fa-barcode" style="font-size: 4rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
-                            <p>Após finalizar o pedido, você poderá imprimir o boleto bancário.</p>
                         </div>
                     </div>
                 </section>

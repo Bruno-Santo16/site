@@ -34,7 +34,7 @@ html {
 
 body {
     font-family: 'Poppins', sans-serif;
-    background: url('../img/bg.png') fixed center/cover no-repeat;
+    background: url('../img/bg.jpg') fixed center/cover no-repeat;
     color: var(--text-light);
     line-height: 1.6;
     min-height: 100vh;
@@ -66,6 +66,10 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+.navbar-logo img {
+    mix-blend-mode: screen;
 }
 
 .navbar-logo {
