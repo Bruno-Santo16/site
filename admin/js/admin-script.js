@@ -2,6 +2,17 @@
    INICIALIZAÇÃO E DADOS
    ============================ */
 
+// Função para prevenir ataques XSS escapando caracteres especiais
+function escapeHTML(str) {
+    if (!str) return "";
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
 // Credenciais admin
 const ADMIN_EMAIL = 'admin@joias.com';
 const ADMIN_PASSWORD = 'admin123';
@@ -65,9 +76,9 @@ function showAdminPanel() {
     document.getElementById('loginContainer').style.display = 'none';
     document.getElementById('adminPanel').style.display = 'block';
 
-    const email = sessionStorage.getItem('adminEmail');
+    const email = sessionStorage.getItem('adminEmail') || "";
     const name = email.split('@')[0];
-    document.getElementById('adminUserName').textContent = name.charAt(0).toUpperCase() + name.slice(1);
+    document.getElementById('adminUserName').textContent = escapeHTML(name.charAt(0).toUpperCase() + name.slice(1));
 
     renderProducts();
     renderPedidos();
@@ -103,12 +114,12 @@ function renderProducts() {
         return `
         <div class="product-item">
             <div class="product-image-container">
-                <img src="${produto.imagem}" alt="${produto.nome}" onerror="this.src='https://placehold.co/200x200?text=${produto.nome}'">
+                <img src="${escapeHTML(produto.imagem)}" alt="${escapeHTML(produto.nome)}" onerror="this.src='https://placehold.co/200x200?text=Erro'">
                 ${temDesconto ? `<div class="admin-badge">-${produto.desconto}%</div>` : ''}
             </div>
             <div class="product-details">
-                <div class="product-category">${produto.categoria}</div>
-                <div class="product-name">${produto.nome}</div>
+                <div class="product-category">${escapeHTML(produto.categoria)}</div>
+                <div class="product-name">${escapeHTML(produto.nome)}</div>
                 <div class="product-price">
                     ${temDesconto ? `<span style="text-decoration: line-through; color: #888; font-size: 0.9rem;">R$ ${produto.preco.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span><br>` : ''}
                     R$ ${precoComDesconto.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
@@ -116,7 +127,7 @@ function renderProducts() {
                 <div class="product-stock" style="color: ${estoqueBaixo ? 'var(--error-color)' : 'var(--success-color)'}; font-weight: 600;">
                     Estoque: ${produto.estoque} unid
                 </div>
-                <div class="product-description">${produto.descricao}</div>
+                <div class="product-description">${escapeHTML(produto.descricao)}</div>
             </div>
             <div class="product-actions">
                 <button class="edit-btn" onclick="editProduct(${produto.id})">
@@ -190,10 +201,10 @@ function renderPedidos() {
                 <div class="order-card" style="background: var(--light-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 1.5rem; margin-bottom: 1.5rem;">
                     <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1rem;">
                         <div>
-                            <strong style="color: var(--primary-color); font-size: 1.2rem;">Pedido #${pedido.id}</strong>
+                            <strong style="color: var(--primary-color); font-size: 1.2rem;">Pedido #${escapeHTML(pedido.id)}</strong>
                             <div style="font-size: 0.9rem; color: #888;">Realizado em: ${new Date(pedido.data).toLocaleString('pt-BR')}</div>
                         </div>
-                        <span class="order-status ${pedido.status}" style="padding: 0.5rem 1rem; border-radius: 20px; font-weight: 600; ${pedido.status === 'pending' ? 'background: rgba(255, 152, 0, 0.2); color: #ff9800;' : pedido.status === 'completed' ? 'background: rgba(76, 175, 80, 0.2); color: #4caf50;' : 'background: rgba(244, 67, 54, 0.2); color: #f44336;'}">
+                        <span class="order-status ${escapeHTML(pedido.status)}" style="padding: 0.5rem 1rem; border-radius: 20px; font-weight: 600; ${pedido.status === 'pending' ? 'background: rgba(255, 152, 0, 0.2); color: #ff9800;' : pedido.status === 'completed' ? 'background: rgba(76, 175, 80, 0.2); color: #4caf50;' : 'background: rgba(244, 67, 54, 0.2); color: #f44336;'}">
                             ${pedido.status === 'pending' ? 'Pendente' : pedido.status === 'completed' ? 'Concluído' : 'Cancelado'}
                         </span>
                     </div>
@@ -201,14 +212,14 @@ function renderPedidos() {
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
                         <div>
                             <h4 style="margin-bottom: 0.5rem; color: var(--primary-color);">Dados do Cliente</h4>
-                            <p><strong>Nome:</strong> ${pedido.cliente.nome}</p>
-                            <p><strong>E-mail:</strong> ${pedido.cliente.email}</p>
-                            <p><strong>Telefone:</strong> ${pedido.cliente.telefone}</p>
+                            <p><strong>Nome:</strong> ${escapeHTML(pedido.cliente.nome)}</p>
+                            <p><strong>E-mail:</strong> ${escapeHTML(pedido.cliente.email)}</p>
+                            <p><strong>Telefone:</strong> ${escapeHTML(pedido.cliente.telefone)}</p>
                             
                             <h4 style="margin-top: 1rem; margin-bottom: 0.5rem; color: var(--primary-color);">Endereço de Entrega</h4>
-                            <p>${pedido.endereco.rua}, ${pedido.endereco.numero} ${pedido.endereco.complemento ? `(${pedido.endereco.complemento})` : ''}</p>
-                            <p>${pedido.endereco.bairro} - ${pedido.endereco.cidade}</p>
-                            <p><strong>CEP:</strong> ${pedido.endereco.cep}</p>
+                            <p>${escapeHTML(pedido.endereco.rua)}, ${escapeHTML(pedido.endereco.numero)} ${pedido.endereco.complemento ? `(${escapeHTML(pedido.endereco.complemento)})` : ''}</p>
+                            <p>${escapeHTML(pedido.endereco.bairro)} - ${escapeHTML(pedido.endereco.city || pedido.endereco.cidade)}</p>
+                            <p><strong>CEP:</strong> ${escapeHTML(pedido.endereco.cep)}</p>
                         </div>
 
                         <div>
@@ -216,9 +227,9 @@ function renderPedidos() {
                             <div style="display: flex; flex-direction: column; gap: 10px;">
                                 ${pedido.itens.map(item => `
                                     <div style="display: flex; align-items: center; gap: 10px; background: var(--dark-bg); padding: 5px; border-radius: 5px;">
-                                        <img src="${item.imagem}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;">
+                                        <img src="${escapeHTML(item.imagem)}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;">
                                         <div style="flex: 1;">
-                                            <div style="font-size: 0.9rem; font-weight: 600;">${item.nome}</div>
+                                            <div style="font-size: 0.9rem; font-weight: 600;">${escapeHTML(item.nome)}</div>
                                             <div style="font-size: 0.8rem; color: #888;">Qtd: ${item.quantidade} x R$ ${item.preco.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
                                         </div>
                                     </div>

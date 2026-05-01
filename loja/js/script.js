@@ -1,3 +1,14 @@
+// Função para prevenir ataques XSS escapando caracteres especiais
+function escapeHTML(str) {
+    if (!str) return "";
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
 /* ============================
    INICIALIZAÇÃO E DADOS
    ============================ */
@@ -65,6 +76,25 @@ function initializeLocalStorage() {
 
     if (!localStorage.getItem('cuponsUsados')) {
         localStorage.setItem('cuponsUsados', JSON.stringify([]));
+    }
+}
+
+// Função para filtrar produtos por categoria via Dropdown
+function filterByCategory(category) {
+    const categoryFilter = document.getElementById('categoryFilter');
+    if (categoryFilter) {
+        categoryFilter.value = category;
+        applyFilters();
+        
+        // Se estivermos em outra página, volta para a home
+        showHome();
+        
+        // Fecha o dropdown (opcional para mobile)
+        const dropdownContent = document.querySelector('.dropdown-content');
+        if (dropdownContent) {
+            dropdownContent.style.display = 'none';
+            setTimeout(() => dropdownContent.style.removeProperty('display'), 100);
+        }
     }
 }
 
@@ -232,7 +262,7 @@ function renderCategories(produtos = null) {
 
         return `
             <div class="category-group">
-                <h2 class="category-title">${cat}</h2>
+                <h2 class="category-title">${escapeHTML(cat)}</h2>
                 <div class="products-grid">
                     ${produtosDaCat.map(produto => {
                         const desconto = produto.desconto || 0;
@@ -245,7 +275,7 @@ function renderCategories(produtos = null) {
                             ${desconto > 0 ? `<div class="product-badge">-${desconto}%</div>` : ''}
                             ${semEstoque ? `<div class="out-of-stock-badge">Esgotado</div>` : ''}
                             <div class="product-image" onclick="openProductModal(${produto.id})">
-                                <img src="${produto.imagem}" alt="${produto.nome}" onerror="this.src='https://placehold.co/400x400?text=${encodeURIComponent(produto.nome)}'">
+                                <img src="${escapeHTML(produto.imagem)}" alt="${escapeHTML(produto.nome)}" onerror="this.src='https://placehold.co/400x400?text=${encodeURIComponent(produto.nome)}'">
                                 <div class="product-image-overlay">
                                     <button class="image-overlay-btn" onclick="event.stopPropagation(); openProductModal(${produto.id})">
                                         <i class="fas fa-eye"></i>
@@ -256,8 +286,8 @@ function renderCategories(produtos = null) {
                                 </div>
                             </div>
                             <div class="product-info">
-                                <div class="product-category">${produto.categoria}</div>
-                                <div class="product-name" onclick="openProductModal(${produto.id})">${produto.nome}</div>
+                                <div class="product-category">${escapeHTML(produto.categoria)}</div>
+                                <div class="product-name" onclick="openProductModal(${produto.id})">${escapeHTML(produto.nome)}</div>
                                 <div class="product-rating">
                                     <span class="stars">${getStars(produto.rating || 5)}</span>
                                     <span class="rating-count">(${produto.reviews ? produto.reviews.length : 0})</span>
@@ -266,7 +296,7 @@ function renderCategories(produtos = null) {
                                     ${desconto > 0 ? `<span class="old-price">R$ ${produto.preco.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>` : ''}
                                     R$ ${precoComDesconto.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                                 </div>
-                                <div class="product-description">${produto.descricao}</div>
+                                <div class="product-description">${escapeHTML(produto.descricao)}</div>
                                 <div class="product-actions">
                                     <button class="add-to-cart-btn" onclick="addToCart(${produto.id})" ${semEstoque ? 'disabled' : ''}>
                                         <i class="fas fa-shopping-cart"></i> ${semEstoque ? 'Indisponível' : 'Adicionar'}
@@ -437,10 +467,10 @@ function updateCartUI() {
             return `
             <div class="cart-item">
                 <div class="cart-item-image">
-                    <img src="${item.imagem}" alt="${item.nome}">
+                    <img src="${escapeHTML(item.imagem)}" alt="${escapeHTML(item.nome)}">
                 </div>
                 <div class="cart-item-details">
-                    <div class="cart-item-name">${item.nome}</div>
+                    <div class="cart-item-name">${escapeHTML(item.nome)}</div>
                     <div class="cart-item-price">
                         ${temDesconto ? `<span style="text-decoration: line-through; color: #888; font-size: 0.8rem; margin-right: 5px;">R$ ${item.preco.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>` : ''}
                         R$ ${precoComDesconto.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
@@ -571,10 +601,10 @@ function updateCheckoutUI() {
         <div class="order-item">
             <div class="order-item-name">
                 <div class="order-item-image">
-                    <img src="${item.imagem}" alt="${item.nome}">
+                    <img src="${escapeHTML(item.imagem)}" alt="${escapeHTML(item.nome)}">
                 </div>
                 <div>
-                    <div>${item.nome}</div>
+                    <div>${escapeHTML(item.nome)}</div>
                     <div class="order-item-qty">Qtd: ${item.quantidade}</div>
                 </div>
             </div>
@@ -928,24 +958,24 @@ function viewOrderDetail(pedidoId) {
     const content = document.getElementById('orderDetailContent');
     content.innerHTML = `
         <div class="order-detail-header">
-            <h3>Pedido #${pedido.id}</h3>
-            <span class="order-status ${pedido.status}">${statusText[pedido.status]}</span>
+            <h3>Pedido #${escapeHTML(pedido.id)}</h3>
+            <span class="order-status ${escapeHTML(pedido.status)}">${statusText[pedido.status]}</span>
         </div>
 
         <div class="order-detail-grid">
             <div class="order-detail-section">
                 <h4><i class="fas fa-user"></i> Cliente</h4>
-                <p>${pedido.cliente.nome}</p>
-                <p>${pedido.cliente.email}</p>
-                <p>${pedido.cliente.telefone}</p>
+                <p>${escapeHTML(pedido.cliente.nome)}</p>
+                <p>${escapeHTML(pedido.cliente.email)}</p>
+                <p>${escapeHTML(pedido.cliente.telefone)}</p>
             </div>
             <div class="order-detail-section">
                 <h4><i class="fas fa-map-marker-alt"></i> Entrega</h4>
-                <p>${pedido.endereco.rua}, ${pedido.endereco.numero}</p>
-                <p>${pedido.endereco.complemento || ''}</p>
-                <p>${pedido.endereco.bairro}</p>
-                <p>${pedido.endereco.cidade}</p>
-                <p>CEP: ${pedido.endereco.cep}</p>
+                <p>${escapeHTML(pedido.endereco.rua)}, ${escapeHTML(pedido.endereco.numero)}</p>
+                <p>${escapeHTML(pedido.endereco.complemento || '')}</p>
+                <p>${escapeHTML(pedido.endereco.bairro)}</p>
+                <p>${escapeHTML(pedido.endereco.cidade)}</p>
+                <p>CEP: ${escapeHTML(pedido.endereco.cep)}</p>
             </div>
         </div>
 
@@ -953,7 +983,7 @@ function viewOrderDetail(pedidoId) {
             <h4><i class="fas fa-box"></i> Itens do Pedido</h4>
             ${pedido.itens.map(item => `
                 <div class="order-item-row">
-                    <span>${item.quantidade}x ${item.nome}</span>
+                    <span>${item.quantidade}x ${escapeHTML(item.nome)}</span>
                     <span>R$ ${(item.preco * item.quantidade).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                 </div>
             `).join('')}
@@ -990,16 +1020,16 @@ function openProductModal(produtoId) {
 
     content.innerHTML = `
         <div class="product-modal-image">
-            <img src="${produto.imagem}" alt="${produto.nome}" id="modalProductImage">
-            <div class="product-modal-zoom" onclick="openImageZoom('${produto.imagem}')">
+            <img src="${escapeHTML(produto.imagem)}" alt="${escapeHTML(produto.nome)}" id="modalProductImage">
+            <div class="product-modal-zoom" onclick="openImageZoom('${escapeHTML(produto.imagem)}')">
                 <i class="fas fa-search-plus"></i>
             </div>
             ${temDesconto ? `<div class="product-modal-badge">-${produto.desconto}%</div>` : ''}
         </div>
 
         <div class="product-modal-info">
-            <div class="product-modal-category">${produto.categoria}</div>
-            <h2>${produto.nome}</h2>
+            <div class="product-modal-category">${escapeHTML(produto.categoria)}</div>
+            <h2>${escapeHTML(produto.nome)}</h2>
             <div class="product-modal-rating">
                 <span class="stars">${getStars(avgRating)}</span>
                 <span class="rating-count">${produto.reviews ? produto.reviews.length : 0} avaliações</span>
@@ -1008,7 +1038,7 @@ function openProductModal(produtoId) {
                 ${temDesconto ? `<span class="old-price">R$ ${produto.preco.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>` : ''}
                 R$ ${precoComDesconto.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
             </div>
-            <div class="product-modal-description">${produto.descricao}</div>
+            <div class="product-modal-description">${escapeHTML(produto.descricao)}</div>
 
             <div class="product-modal-quantity">
                 <label>Quantidade:</label>
@@ -1055,11 +1085,11 @@ function openProductModal(produtoId) {
                     ${produto.reviews && produto.reviews.length > 0 ? produto.reviews.map(review => `
                         <div class="review-item">
                             <div class="review-header">
-                                <span class="reviewer-name">${review.nome}</span>
+                                <span class="reviewer-name">${escapeHTML(review.nome)}</span>
                                 <span class="review-date">${new Date(review.data).toLocaleDateString('pt-BR')}</span>
                             </div>
                             <div class="review-stars">${getStars(review.rating)}</div>
-                            <p class="review-text">${review.texto}</p>
+                            <p class="review-text">${escapeHTML(review.texto)}</p>
                         </div>
                     `).join('') : '<p style="color: #888;">Nenhuma avaliação ainda. Seja o primeiro a avaliar!</p>'}
                 </div>

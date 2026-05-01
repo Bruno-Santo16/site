@@ -153,7 +153,8 @@ Site loja/
 - Slide-in para notificações toast
 - Fade-in para modais
 - Shimmer para loading skeletons
-- Sparkle no ícone da logo
+- Sparkle no ícone da logogemini
+
 
 ## 💾 LocalStorage
 

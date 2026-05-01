@@ -48,18 +48,20 @@ body {
     position: fixed;
     top: 0;
     width: 100%;
+    height: 80px; /* Altura fixa garantida */
     background: rgba(26, 26, 26, 0.95);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
-    padding: 1rem 0;
-    z-index: 1000;
+    display: flex;
+    align-items: center;
+    z-index: 10000;
     border-bottom: 2px solid var(--primary-color);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5),
-                0 1px 0 rgba(75, 108, 183, 0.1) inset;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
     transition: all 0.3s ease;
 }
 
 .navbar-container {
+    width: 100%; /* Garante que ocupe toda a largura */
     max-width: 1400px;
     margin: 0 auto;
     padding: 0 2rem;
@@ -72,13 +74,22 @@ body {
     mix-blend-mode: screen;
 }
 
+.navbar-logo span {
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    font-size: 2rem; /* Aumentado para dar mais destaque */
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, #ffffff 0%, #d4af37 50%, #ffffff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
 .navbar-logo {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--primary-color);
+    gap: 1rem;
     text-decoration: none;
     cursor: pointer;
 }
@@ -98,6 +109,72 @@ body {
     gap: 2rem;
     flex: 1;
     margin-left: 3rem;
+    align-items: center;
+}
+
+/* Dropdown Styles */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropbtn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: rgba(26, 26, 26, 0.98);
+    min-width: 200px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
+    z-index: 1001;
+    border-radius: 10px;
+    top: 100%;
+    left: 0;
+    padding: 10px 0;
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--primary-color);
+    animation: fadeInDown 0.3s ease-out;
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dropdown-content a {
+    color: white;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    transition: all 0.3s;
+    font-size: 0.9rem;
+    border-bottom: none !important;
+}
+
+.dropdown-content a:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--primary-color) !important;
+    padding-left: 20px;
+}
+
+.dropdown-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 5px 0;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
 }
 
 .navbar-menu a {
@@ -187,16 +264,56 @@ body {
 }
 
 /* ============================
-   HERO SECTION
+   PROMO BAR
    ============================ */
 
+.promo-bar {
+    position: fixed;
+    top: 80px; /* Alinhado com a altura fixa da navbar */
+    width: 100%;
+    background: #ffea00 !important;
+    color: #000000 !important;
+    height: 35px;
+    z-index: 9999;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+.promo-ticker {
+    display: flex;
+    white-space: nowrap;
+    animation: ticker 25s linear infinite;
+}
+
+.promo-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 4rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+@keyframes ticker {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+/* Ajuste na Hero Section e outras páginas */
+#homePage, #checkoutPage, #profilePage {
+    margin-top: 0;
+}
+
 .hero-section {
-    margin-top: 80px;
-    min-height: 500px;
-    background: linear-gradient(135deg, rgba(75, 108, 183, 0.15) 0%, rgba(255, 20, 147, 0.1) 100%),
-                url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 500"><defs><pattern id="gems" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="20" fill="%23d4af37" opacity="0.1"/></pattern></defs><rect width="1200" height="500" fill="%231a1a1a"/><rect width="1200" height="500" fill="url(%23gems)"/></svg>');
-    background-size: cover;
-    background-position: center;
+    margin-top: 115px; /* 80px navbar + 35px promo bar */
+    min-height: 550px;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.7) 0%, rgba(15, 23, 42, 0.8) 100%),
+                url('../img/bg.jpg') center/cover no-repeat;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -204,6 +321,7 @@ body {
     position: relative;
     overflow: hidden;
 }
+
 
 .hero-section::before {
     content: '';
@@ -2347,16 +2465,16 @@ body {
 
 .profile-dropdown {
     position: fixed;
-    top: 75px;
+    top: 80px; /* Alinhado com a base da navbar */
     right: 2rem;
-    background: rgba(30, 41, 59, 0.95);
+    background: rgba(30, 41, 59, 0.98);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--primary-color);
     border-radius: 15px;
     width: 240px;
-    z-index: 1001;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+    z-index: 10001; /* Maior que a navbar (10000) e promo-bar (9999) */
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
     padding: 0.8rem;
     animation: fadeInDown 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -2424,3 +2542,4 @@ body {
     background: rgba(239, 68, 68, 0.1);
     color: var(--error-color);
 }
+
