@@ -2444,6 +2444,22 @@ body {
     }
 }
 
+/* CATEGORY SECTIONS */
+.category-section {
+    margin-bottom: 50px;
+    padding: 0 20px;
+}
+
+.category-title {
+    font-family: 'Cinzel', serif;
+    color: var(--primary-color);
+    font-size: 2rem;
+    margin-bottom: 25px;
+    border-bottom: 2px solid var(--primary-color);
+    display: inline-block;
+    padding-bottom: 5px;
+}
+
 /* ============================
    CARROSSEL DE PRODUTOS
    ============================ */
