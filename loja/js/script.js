@@ -15,7 +15,7 @@ function escapeHTML(str) {
 // Mude para a URL do seu servidor no Render/Railway quando fizer o deploy
 const API_URL = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost' 
     ? 'http://127.0.0.1:3000' 
-    : 'https://SUA-API-NO-RENDER.onrender.com'; // <--- Você vai trocar isso depois
+    : 'https://site-kc4k.onrender.com';
 
 /* ============================
    INICIALIZAÇÃO E DADOS

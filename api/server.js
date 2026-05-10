@@ -86,7 +86,7 @@ app.post('/create_preference', createPreferenceLimiter, async (req, res) => {
                 neighborhood: (address.neighborhood || '').substring(0, 100),
                 city: (address.city || '').substring(0, 100)
             },
-            redirect_url: `http://127.0.0.1:5500/loja/index.html?status=success&order_id=${external_reference}`,
+            redirect_url: `https://site-loja-frontend.onrender.com/loja/index.html?status=success&order_id=${external_reference}`,
             webhook_url: `https://seu-webhook.com/webhook`
         };
 
