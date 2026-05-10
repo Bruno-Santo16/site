@@ -93,6 +93,13 @@ document.getElementById('registerForm').addEventListener('submit', function(e) {
     }, 1500);
 });
 
+// Lidar com Login Social (Simulado)
+document.querySelectorAll('.social-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        showToast('Login social em desenvolvimento. Por favor, use e-mail e senha.', 'error');
+    });
+});
+
 // Toast Notifications
 function showToast(message, type = 'success') {
     const container = document.getElementById('toastContainer');
