@@ -96,14 +96,33 @@
 
                         <h4>Adicionar Novo Banner</h4>
                         <form id="bannerForm" style="margin-top: 1rem;">
-                            <div class="form-group">
-                                <label>Título do Banner:</label>
-                                <input type="text" id="bannerTitle" placeholder="ex: Nova Coleção 2026" required>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Título (Opcional):</label>
+                                    <input type="text" id="bannerTitle" placeholder="ex: Nova Coleção 2026">
+                                </div>
+                                <div class="form-group">
+                                    <label>Subtítulo (Opcional):</label>
+                                    <input type="text" id="bannerSubtitle" placeholder="ex: Ganhe 10% de desconto...">
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label>Subtítulo / Frase:</label>
-                                <input type="text" id="bannerSubtitle" placeholder="ex: Ganhe 10% de desconto..." required>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Ao clicar, mandar para:</label>
+                                    <select id="bannerLinkType" onchange="toggleBannerProductSelect()">
+                                        <option value="catalogo">Coleção Geral (Catálogo)</option>
+                                        <option value="produto">Produto Específico</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" id="bannerProductSelectGroup" style="display: none;">
+                                    <label>Escolha o Produto:</label>
+                                    <select id="bannerProductTarget">
+                                        <!-- Produtos carregados via JS -->
+                                    </select>
+                                </div>
                             </div>
+
                             <div class="form-group">
                                 <label>Foto do Banner (URL ou Arquivo):</label>
                                 <div style="display: flex; gap: 0.5rem;">

@@ -92,11 +92,25 @@ function deleteBanner(id) {
 function openBannerForm() {
     document.getElementById('bannerFormSection').style.display = 'block';
     renderBannersAdmin();
+    populateBannerProductSelect();
     document.getElementById('bannerFormSection').scrollIntoView({ behavior: 'smooth' });
 }
 
-function closeBannerForm() {
-    document.getElementById('bannerFormSection').style.display = 'none';
+function toggleBannerProductSelect() {
+    const type = document.getElementById('bannerLinkType').value;
+    const group = document.getElementById('bannerProductSelectGroup');
+    group.style.display = type === 'produto' ? 'block' : 'none';
+}
+
+function populateBannerProductSelect() {
+    const select = document.getElementById('bannerProductTarget');
+    const produtos = getProdutos();
+    
+    if (select) {
+        select.innerHTML = produtos.map(p => `
+            <option value="${p.id}">${escapeHTML(p.nome)} (R$ ${p.preco.toFixed(2)})</option>
+        `).join('');
+    }
 }
 
 function handleBannerSubmit(e) {
@@ -104,24 +118,29 @@ function handleBannerSubmit(e) {
     const title = document.getElementById('bannerTitle').value;
     const subtitle = document.getElementById('bannerSubtitle').value;
     const imageUrl = document.getElementById('bannerImageUrl').value;
+    const linkType = document.getElementById('bannerLinkType').value;
+    const productTarget = document.getElementById('bannerProductTarget').value;
 
-    if (!title || !subtitle || !imageUrl) {
-        alert('Preencha todos os campos do banner!');
+    if (!imageUrl) {
+        alert('A foto do banner é obrigatória!');
         return;
     }
 
     const banners = getBanners();
     const newBanner = {
         id: Date.now(),
-        title: title,
-        subtitle: subtitle,
-        image: imageUrl
+        title: title || '',
+        subtitle: subtitle || '',
+        image: imageUrl,
+        linkType: linkType,
+        targetId: linkType === 'produto' ? productTarget : null
     };
 
     banners.push(newBanner);
     saveBanners(banners);
     renderBannersAdmin();
     document.getElementById('bannerForm').reset();
+    toggleBannerProductSelect();
     showNotification('Banner adicionado com sucesso!', 'success');
 }
 

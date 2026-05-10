@@ -1449,20 +1449,29 @@ function setupHeroCarousel() {
     if (!slidesContainer || banners.length === 0) return;
 
     // Gerar Slides
-    slidesContainer.innerHTML = banners.map((banner, i) => `
-        <div class="hero-slide ${i === 0 ? 'active' : ''}" style="background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('${banner.image.startsWith('data:') ? banner.image : (banner.image.includes('http') ? banner.image : banner.image)}');">
+    slidesContainer.innerHTML = banners.map((banner, i) => {
+        const hasText = banner.title || banner.subtitle;
+        const link = banner.linkType === 'produto' ? `javascript:openProductModal(${banner.targetId})` : '#catalogo';
+        
+        return `
+        <div class="hero-slide ${i === 0 ? 'active' : ''}" 
+             style="background-image: linear-gradient(rgba(0,0,0,${hasText ? '0.5' : '0'}), rgba(0,0,0,${hasText ? '0.5' : '0'})), url('${banner.image.startsWith('data:') ? banner.image : banner.image}'); cursor: pointer;"
+             onclick="${banner.linkType === 'produto' ? `openProductModal(${banner.targetId})` : 'location.href=\"#catalogo\"'}">
+            
+            ${hasText ? `
             <div class="hero-content">
-                <h1 class="animate-up">${escapeHTML(banner.title)}</h1>
-                <p class="animate-up">${escapeHTML(banner.subtitle)}</p>
-                <a href="#catalogo" class="hero-cta animate-up">Ver Coleção</a>
+                ${banner.title ? `<h1 class="animate-up">${escapeHTML(banner.title)}</h1>` : ''}
+                ${banner.subtitle ? `<p class="animate-up">${escapeHTML(banner.subtitle)}</p>` : ''}
+                <a href="${link}" class="hero-cta animate-up" onclick="event.stopPropagation()">Ver Detalhes</a>
             </div>
+            ` : ''}
         </div>
-    `).join('');
+    `}).join('');
 
     // Gerar pontos (dots)
     if (dotsContainer) {
         dotsContainer.innerHTML = banners.map((_, i) => `
-            <div class="hero-dot ${i === 0 ? 'active' : ''}" onclick="goToHeroSlide(${i})"></div>
+            <div class="hero-dot ${i === 0 ? 'active' : ''}" onclick="event.stopPropagation(); goToHeroSlide(${i})"></div>
         `).join('');
     }
 
