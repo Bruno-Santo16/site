@@ -2396,12 +2396,17 @@ body {
     }
 
     .products-grid {
-        grid-template-columns: repeat(2, 1fr);
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        grid-template-columns: none !important;
         gap: 0.8rem;
     }
 
     .product-card {
         padding: 0.8rem;
+        min-width: 180px; /* Garante que os itens tenham tamanho para ficar lado a lado */
+        flex: 0 0 auto;
     }
 
     .product-info h3 {
