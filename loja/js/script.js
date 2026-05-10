@@ -269,57 +269,58 @@ function renderCategories(produtos = null) {
         const produtosDaCat = produtosToRender.filter(p => (p.categoria || 'Geral') === cat);
 
         return `
-            <div class="category-group">
+            <div class="category-section">
                 <h2 class="category-title">${escapeHTML(cat)}</h2>
-                <div class="products-grid">
-                    ${produtosDaCat.map(produto => {
-                        const desconto = produto.desconto || 0;
-                        const estoque = produto.estoque !== undefined ? produto.estoque : 10;
-                        const precoComDesconto = desconto > 0 ? produto.preco * (1 - desconto / 100) : produto.preco;
-                        const semEstoque = estoque <= 0;
+                <div class="carousel-wrapper">
+                    <button class="carousel-btn prev" onclick="scrollCarousel(this, -1)"><i class="fas fa-chevron-left"></i></button>
+                    <div class="carousel-container">
+                        <div class="products-grid">
+                            ${produtosDaCat.map(produto => {
+                                const desconto = produto.desconto || 0;
+                                const estoque = produto.estoque !== undefined ? produto.estoque : 10;
+                                const precoComDesconto = desconto > 0 ? produto.preco * (1 - desconto / 100) : produto.preco;
+                                const semEstoque = estoque <= 0;
 
-                        return `
-                        <div class="product-card ${semEstoque ? 'out-of-stock' : ''}">
-                            ${desconto > 0 ? `<div class="product-badge">-${desconto}%</div>` : ''}
-                            ${semEstoque ? `<div class="out-of-stock-badge">Esgotado</div>` : ''}
-                            <div class="product-image" onclick="openProductModal(${produto.id})">
-                                <img src="${escapeHTML(produto.imagem)}" alt="${escapeHTML(produto.nome)}" onerror="this.src='https://placehold.co/400x400?text=${encodeURIComponent(produto.nome)}'">
-                                <div class="product-image-overlay">
-                                    <button class="image-overlay-btn" onclick="event.stopPropagation(); openProductModal(${produto.id})">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                    <button class="image-overlay-btn" onclick="event.stopPropagation(); toggleWishlist(${produto.id})">
-                                        <i class="fas fa-heart"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="product-info">
-                                <div class="product-category">${escapeHTML(produto.categoria)}</div>
-                                <div class="product-name" onclick="openProductModal(${produto.id})">${escapeHTML(produto.nome)}</div>
-                                <div class="product-rating">
-                                    <span class="stars">${getStars(produto.rating || 5)}</span>
-                                    <span class="rating-count">(${produto.reviews ? produto.reviews.length : 0})</span>
-                                </div>
-                                <div class="product-price">
-                                    ${desconto > 0 ? `<span class="old-price">R$ ${produto.preco.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>` : ''}
-                                    R$ ${precoComDesconto.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                                </div>
-                                <div class="product-description">${escapeHTML(produto.descricao)}</div>
-                                <div class="product-actions">
-                                    <button class="add-to-cart-btn" onclick="addToCart(${produto.id})" ${semEstoque ? 'disabled' : ''}>
-                                        <i class="fas fa-shopping-cart"></i> ${semEstoque ? 'Indisponível' : 'Adicionar'}
-                                    </button>
-                                    <button class="wishlist-btn ${isInWishlist(produto.id) ? 'active' : ''}" onclick="toggleWishlist(${produto.id})">
-                                        <i class="fas fa-heart"></i>
-                                    </button>
-                                </div>
-                            </div>
+                                return `
+                                <div class="product-card ${semEstoque ? 'out-of-stock' : ''}">
+                                    ${desconto > 0 ? `<div class="product-badge">-${desconto}%</div>` : ''}
+                                    ${semEstoque ? `<div class="out-of-stock-badge">Esgotado</div>` : ''}
+                                    <div class="product-image" onclick="openProductModal(${produto.id})">
+                                        <img src="${escapeHTML(produto.imagem)}" alt="${escapeHTML(produto.nome)}" onerror="this.src='https://placehold.co/400x400?text=${encodeURIComponent(produto.nome)}'">
+                                    </div>
+                                    <div class="product-info">
+                                        <div class="product-category">${escapeHTML(produto.categoria)}</div>
+                                        <div class="product-name" onclick="openProductModal(${produto.id})">${escapeHTML(produto.nome)}</div>
+                                        <div class="product-price">
+                                            ${desconto > 0 ? `<span class="old-price">R$ ${produto.preco.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>` : ''}
+                                            R$ ${precoComDesconto.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                        </div>
+                                        <div class="product-actions">
+                                            <button class="add-to-cart-btn" onclick="event.stopPropagation(); addToCart(${produto.id})" ${semEstoque ? 'disabled' : ''}>
+                                                <i class="fas fa-shopping-cart"></i> ${semEstoque ? 'Esgotado' : 'Adicionar'}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>`
+                            }).join('')}
                         </div>
-                    `}).join('')}
+                    </div>
+                    <button class="carousel-btn next" onclick="scrollCarousel(this, 1)"><i class="fas fa-chevron-right"></i></button>
                 </div>
             </div>
         `;
     }).join('');
+}
+
+// Função para rolar o carrossel de produtos específico
+function scrollCarousel(btn, direction) {
+    const wrapper = btn.closest('.carousel-wrapper');
+    const container = wrapper.querySelector('.carousel-container');
+    const scrollAmount = container.offsetWidth * 0.8;
+    container.scrollBy({
+        left: direction * scrollAmount,
+        behavior: 'smooth'
+    });
 }
 
 function getStars(rating) {
