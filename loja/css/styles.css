@@ -2526,7 +2526,23 @@ body {
     }
     
     .carousel-container .product-card {
-        min-width: 200px;
+        min-width: 160px; /* Reduzido de 200px */
+    }
+
+    .product-image {
+        height: 160px !important; /* Reduzido de 220px */
+    }
+
+    .product-info {
+        padding: 0.8rem;
+    }
+
+    .product-name {
+        font-size: 0.85rem;
+    }
+
+    .product-price {
+        font-size: 0.95rem;
     }
     
     .carousel-btn {
