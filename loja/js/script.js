@@ -1422,6 +1422,65 @@ function toggleProfileDropdown() {
 }
 
 // ============================
+// CARROSSEL HERO (BANNERS)
+// ============================
+
+let currentHeroSlide = 0;
+let heroInterval;
+
+function setupHeroCarousel() {
+    const slides = document.querySelectorAll('.hero-slide');
+    if (slides.length === 0) return;
+
+    // Criar pontos (dots) dinamicamente
+    const dotsContainer = document.getElementById('heroDots');
+    if (dotsContainer) {
+        dotsContainer.innerHTML = '';
+        slides.forEach((_, i) => {
+            const dot = document.createElement('div');
+            dot.className = `hero-dot ${i === 0 ? 'active' : ''}`;
+            dot.onclick = () => goToHeroSlide(i);
+            dotsContainer.appendChild(dot);
+        });
+    }
+
+    startHeroTimer();
+}
+
+function moveHeroSlide(direction) {
+    const slides = document.querySelectorAll('.hero-slide');
+    if (slides.length === 0) return;
+    
+    let nextSlide = currentHeroSlide + direction;
+
+    if (nextSlide >= slides.length) nextSlide = 0;
+    if (nextSlide < 0) nextSlide = slides.length - 1;
+
+    goToHeroSlide(nextSlide);
+}
+
+function goToHeroSlide(index) {
+    const slides = document.querySelectorAll('.hero-slide');
+    const dots = document.querySelectorAll('.hero-dot');
+    if (slides.length === 0) return;
+
+    slides[currentHeroSlide].classList.remove('active');
+    if (dots[currentHeroSlide]) dots[currentHeroSlide].classList.remove('active');
+
+    currentHeroSlide = index;
+
+    slides[currentHeroSlide].classList.add('active');
+    if (dots[currentHeroSlide]) dots[currentHeroSlide].classList.add('active');
+
+    startHeroTimer();
+}
+
+function startHeroTimer() {
+    clearInterval(heroInterval);
+    heroInterval = setInterval(() => moveHeroSlide(1), 5000);
+}
+
+// ============================
 // EVENT LISTENERS
 // ============================
 
@@ -1451,6 +1510,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateCartUI();
         updateLoginUI();
         setupMasks();
+        setupHeroCarousel();
     } catch (e) {
         console.error("Erro durante a inicialização:", e);
     }

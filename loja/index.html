@@ -94,13 +94,30 @@
 
     <!-- PÁGINA INICIAL -->
     <div id="homePage">
-        <!-- HERO SECTION -->
-        <section class="hero-section">
-            <div class="hero-content">
-                <h1>Joias que Brilham como Você</h1>
-                <p>Descubra nossa coleção exclusiva de joias premium</p>
-                <a href="#catalogo" class="hero-cta">Ver Coleção</a>
+        <!-- HERO SECTION (BANNER CARROSSEL) -->
+        <section class="hero-carousel">
+            <div class="hero-slides" id="heroSlides">
+                <!-- Banner 1 -->
+                <div class="hero-slide active" style="background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('img/bg.jpg');">
+                    <div class="hero-content">
+                        <h1 class="animate-up">Joias que Brilham como Você</h1>
+                        <p class="animate-up">Descubra nossa coleção exclusiva de joias premium com design único.</p>
+                        <a href="#catalogo" class="hero-cta animate-up">Ver Coleção</a>
+                    </div>
+                </div>
+                <!-- Banner 2 -->
+                <div class="hero-slide" style="background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('img/bg.png');">
+                    <div class="hero-content">
+                        <h1 class="animate-up">Nova Coleção 2026</h1>
+                        <p class="animate-up">Ganhe 10% de desconto na sua primeira compra usando o cupom <strong>BEMVINDO</strong>.</p>
+                        <a href="#catalogo" onclick="filterByCategory('Lançamentos')" class="hero-cta animate-up">Ver Novidades</a>
+                    </div>
+                </div>
             </div>
+            <!-- Controles do Banner -->
+            <button class="hero-prev" onclick="moveHeroSlide(-1)"><i class="fas fa-chevron-left"></i></button>
+            <button class="hero-next" onclick="moveHeroSlide(1)"><i class="fas fa-chevron-right"></i></button>
+            <div class="hero-dots" id="heroDots"></div>
         </section>
 
         <!-- BUSCA E FILTROS -->
