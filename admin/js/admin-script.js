@@ -1,6 +1,11 @@
 /* ============================
-   INICIALIZAÇÃO E DADOS
+   INICIALIZAÇÃO E SEGURANÇA
    ============================ */
+
+// Bloqueia acesso direto se não estiver logado
+if (!sessionStorage.getItem('adminLogged') && !window.location.href.includes('index.html')) {
+    window.location.href = 'index.html'; 
+}
 
 // Função para prevenir ataques XSS escapando caracteres especiais
 function escapeHTML(str) {
