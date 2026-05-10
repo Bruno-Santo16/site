@@ -1,0 +1,25 @@
+services:
+  # Backend (API)
+  - type: web
+    name: site-loja-api
+    env: node
+    rootDir: api
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: INFINITEPAY_HANDLE
+        sync: false # Você precisará preencher isso no painel do Render
+
+  # Frontend (O site em si)
+  - type: static
+    name: site-loja-frontend
+    env: static
+    buildCommand: "" # Não precisa de build para HTML puro
+    publishPath: ./
+    headers:
+      - path: /*
+        headers:
+          - key: Access-Control-Allow-Origin
+            value: "*"
