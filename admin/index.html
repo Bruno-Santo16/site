@@ -69,12 +69,59 @@
         <!-- CONTEÚDO PRINCIPAL -->
         <main class="admin-main">
             <div class="container">
-                <!-- CABEÇALHO -->
+                <!-- GERENCIAMENTO DE PRODUTOS -->
                 <section class="admin-header">
                     <h2>Gerenciamento de Produtos</h2>
-                    <button class="btn-primary" id="addProductBtn">
-                        <i class="fas fa-plus"></i> Adicionar Novo Produto
-                    </button>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn-primary" id="addBannerBtn" style="background: var(--accent-color); color: white;">
+                            <i class="fas fa-image"></i> Gerenciar Banners
+                        </button>
+                        <button class="btn-primary" id="addProductBtn">
+                            <i class="fas fa-plus"></i> Adicionar Novo Produto
+                        </button>
+                    </div>
+                </section>
+
+                <!-- FORMULÁRIO DE BANNERS -->
+                <section class="product-form-section" id="bannerFormSection" style="display: none; margin-bottom: 2rem;">
+                    <div class="form-card" style="border-left: 5px solid var(--accent-color);">
+                        <h3>Gerenciar Banners do Topo</h3>
+                        <p style="margin-bottom: 1rem; color: #888;">Adicione ou remova as fotos e frases que aparecem no início da loja.</p>
+                        
+                        <div id="bannersList" style="margin-bottom: 2rem;">
+                            <!-- Lista de banners atuais -->
+                        </div>
+
+                        <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 2rem 0;">
+
+                        <h4>Adicionar Novo Banner</h4>
+                        <form id="bannerForm" style="margin-top: 1rem;">
+                            <div class="form-group">
+                                <label>Título do Banner:</label>
+                                <input type="text" id="bannerTitle" placeholder="ex: Nova Coleção 2026" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Subtítulo / Frase:</label>
+                                <input type="text" id="bannerSubtitle" placeholder="ex: Ganhe 10% de desconto..." required>
+                            </div>
+                            <div class="form-group">
+                                <label>Foto do Banner (URL ou Arquivo):</label>
+                                <div style="display: flex; gap: 0.5rem;">
+                                    <input type="text" id="bannerImageUrl" placeholder="URL da imagem..." style="flex: 1;">
+                                    <input type="file" id="bannerImageFile" accept="image/*" style="display: none;">
+                                    <button type="button" class="btn-secondary" onclick="document.getElementById('bannerImageFile').click()" style="width: auto; padding: 0 1rem;">
+                                        <i class="fas fa-search"></i> Explorar
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn-primary" style="background: var(--accent-color); color: white;">
+                                    <i class="fas fa-plus"></i> Adicionar Banner
+                                </button>
+                                <button type="button" class="btn-secondary" onclick="closeBannerForm()">Fechar</button>
+                            </div>
+                        </form>
+                    </div>
                 </section>
 
                 <!-- FORMULÁRIO DE ADICIONAR/EDITAR PRODUTO -->

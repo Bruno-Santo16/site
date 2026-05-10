@@ -1428,28 +1428,51 @@ function toggleProfileDropdown() {
 let currentHeroSlide = 0;
 let heroInterval;
 
-function setupHeroCarousel() {
-    const slides = document.querySelectorAll('.hero-slide');
-    if (slides.length === 0) return;
+function getBanners() {
+    const defaultBanners = [
+        { id: 1, title: 'Joias que Brilham como Você', subtitle: 'Descubra nossa coleção exclusiva de joias premium com design único.', image: 'img/bg.jpg' },
+        { id: 2, title: 'Nova Coleção 2026', subtitle: 'Ganhe 10% de desconto na sua primeira compra usando o cupom BEMVINDO.', image: 'img/bg.png' }
+    ];
+    try {
+        const stored = localStorage.getItem('banners');
+        return stored ? JSON.parse(stored) : defaultBanners;
+    } catch (e) {
+        return defaultBanners;
+    }
+}
 
-    // Criar pontos (dots) dinamicamente
+function setupHeroCarousel() {
+    const banners = getBanners();
+    const slidesContainer = document.getElementById('heroSlides');
     const dotsContainer = document.getElementById('heroDots');
+    
+    if (!slidesContainer || banners.length === 0) return;
+
+    // Gerar Slides
+    slidesContainer.innerHTML = banners.map((banner, i) => `
+        <div class="hero-slide ${i === 0 ? 'active' : ''}" style="background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('${banner.image.startsWith('data:') ? banner.image : (banner.image.includes('http') ? banner.image : banner.image)}');">
+            <div class="hero-content">
+                <h1 class="animate-up">${escapeHTML(banner.title)}</h1>
+                <p class="animate-up">${escapeHTML(banner.subtitle)}</p>
+                <a href="#catalogo" class="hero-cta animate-up">Ver Coleção</a>
+            </div>
+        </div>
+    `).join('');
+
+    // Gerar pontos (dots)
     if (dotsContainer) {
-        dotsContainer.innerHTML = '';
-        slides.forEach((_, i) => {
-            const dot = document.createElement('div');
-            dot.className = `hero-dot ${i === 0 ? 'active' : ''}`;
-            dot.onclick = () => goToHeroSlide(i);
-            dotsContainer.appendChild(dot);
-        });
+        dotsContainer.innerHTML = banners.map((_, i) => `
+            <div class="hero-dot ${i === 0 ? 'active' : ''}" onclick="goToHeroSlide(${i})"></div>
+        `).join('');
     }
 
+    currentHeroSlide = 0;
     startHeroTimer();
 }
 
 function moveHeroSlide(direction) {
     const slides = document.querySelectorAll('.hero-slide');
-    if (slides.length === 0) return;
+    if (slides.length <= 1) return;
     
     let nextSlide = currentHeroSlide + direction;
 
@@ -1477,8 +1500,12 @@ function goToHeroSlide(index) {
 
 function startHeroTimer() {
     clearInterval(heroInterval);
-    heroInterval = setInterval(() => moveHeroSlide(1), 5000);
+    const slides = document.querySelectorAll('.hero-slide');
+    if (slides.length > 1) {
+        heroInterval = setInterval(() => moveHeroSlide(1), 5000);
+    }
 }
+
 
 // ============================
 // EVENT LISTENERS

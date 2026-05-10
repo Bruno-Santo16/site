@@ -37,6 +37,89 @@ function saveProdutos(produtos) {
     localStorage.setItem('produtos', JSON.stringify(produtos));
 }
 
+// BANNERS
+function getBanners() {
+    const defaultBanners = [
+        { id: 1, title: 'Joias que Brilham como Você', subtitle: 'Descubra nossa coleção exclusiva de joias premium com design único.', image: 'img/bg.jpg' },
+        { id: 2, title: 'Nova Coleção 2026', subtitle: 'Ganhe 10% de desconto na sua primeira compra usando o cupom BEMVINDO.', image: 'img/bg.png' }
+    ];
+    return JSON.parse(localStorage.getItem('banners')) || defaultBanners;
+}
+
+function saveBanners(banners) {
+    localStorage.setItem('banners', JSON.stringify(banners));
+}
+
+function renderBannersAdmin() {
+    const banners = getBanners();
+    const container = document.getElementById('bannersList');
+    if (!container) return;
+
+    if (banners.length === 0) {
+        container.innerHTML = '<p style="color: #888;">Nenhum banner cadastrado.</p>';
+        return;
+    }
+
+    container.innerHTML = banners.map(banner => `
+        <div style="display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; margin-bottom: 10px; border: 1px solid var(--border-color);">
+            <img src="../loja/${banner.image}" style="width: 100px; height: 60px; object-fit: cover; border-radius: 5px;" onerror="this.src='${banner.image}'">
+            <div style="flex: 1;">
+                <div style="font-weight: 600; color: var(--primary-color);">${escapeHTML(banner.title)}</div>
+                <div style="font-size: 0.8rem; color: #aaa;">${escapeHTML(banner.subtitle)}</div>
+            </div>
+            <button class="delete-btn" onclick="deleteBanner(${banner.id})" style="padding: 5px 10px; background: var(--error-color); border: none; border-radius: 5px; color: white; cursor: pointer;">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    `).join('');
+}
+
+function deleteBanner(id) {
+    if (confirm('Deseja realmente excluir este banner?')) {
+        let banners = getBanners();
+        banners = banners.filter(b => b.id !== id);
+        saveBanners(banners);
+        renderBannersAdmin();
+        showNotification('Banner removido!', 'success');
+    }
+}
+
+function openBannerForm() {
+    document.getElementById('bannerFormSection').style.display = 'block';
+    renderBannersAdmin();
+    document.getElementById('bannerFormSection').scrollIntoView({ behavior: 'smooth' });
+}
+
+function closeBannerForm() {
+    document.getElementById('bannerFormSection').style.display = 'none';
+}
+
+function handleBannerSubmit(e) {
+    e.preventDefault();
+    const title = document.getElementById('bannerTitle').value;
+    const subtitle = document.getElementById('bannerSubtitle').value;
+    const imageUrl = document.getElementById('bannerImageUrl').value;
+
+    if (!title || !subtitle || !imageUrl) {
+        alert('Preencha todos os campos do banner!');
+        return;
+    }
+
+    const banners = getBanners();
+    const newBanner = {
+        id: Date.now(),
+        title: title,
+        subtitle: subtitle,
+        image: imageUrl
+    };
+
+    banners.push(newBanner);
+    saveBanners(banners);
+    renderBannersAdmin();
+    document.getElementById('bannerForm').reset();
+    showNotification('Banner adicionado com sucesso!', 'success');
+}
+
 // Verificar se admin está logado
 function isAdminLogged() {
     return sessionStorage.getItem('adminLogged') === 'true';
@@ -482,6 +565,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // Form
     document.getElementById('productForm').addEventListener('submit', handleProductFormSubmit);
     document.getElementById('productImageFile').addEventListener('change', handleImageFileSelect);
+    
+    // Banner Form
+    document.getElementById('addBannerBtn').addEventListener('click', openBannerForm);
+    document.getElementById('bannerForm').addEventListener('submit', handleBannerSubmit);
+    document.getElementById('bannerImageFile').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                document.getElementById('bannerImageUrl').value = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
 
     // Modal
     document.getElementById('cancelDeleteBtn').addEventListener('click', closeConfirmModal);
