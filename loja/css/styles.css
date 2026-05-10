@@ -2440,8 +2440,81 @@ body {
 }
 
 /* ============================
-   SCROLL STYLES
+   CARROSSEL DE PRODUTOS
    ============================ */
+.carousel-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 0 40px;
+}
+
+.carousel-container {
+    display: flex !important;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    gap: 20px;
+    padding: 20px 0;
+    width: 100%;
+    scrollbar-width: none; /* Firefox */
+}
+
+.carousel-container::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}
+
+.carousel-container .products-grid {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 20px;
+}
+
+.carousel-container .product-card {
+    min-width: 280px;
+    flex: 0 0 auto;
+}
+
+.carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--primary-color);
+    color: var(--text-dark);
+    border: none;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 10;
+    font-size: 1.2rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    transition: all 0.3s;
+}
+
+.carousel-btn:hover {
+    background: var(--primary-light);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.carousel-btn.prev { left: 0; }
+.carousel-btn.next { right: 0; }
+
+@media (max-width: 768px) {
+    .carousel-wrapper {
+        padding: 0 10px;
+    }
+    
+    .carousel-container .product-card {
+        min-width: 200px;
+    }
+    
+    .carousel-btn {
+        width: 35px;
+        height: 35px;
+        font-size: 1rem;
+    }
+}
+
 
 .cart-items::-webkit-scrollbar,
 .reviews-list::-webkit-scrollbar,
